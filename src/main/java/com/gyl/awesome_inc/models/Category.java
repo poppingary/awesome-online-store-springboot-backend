@@ -1,4 +1,4 @@
-package com.gyl.awesome_inc.entity;
+package com.gyl.awesome_inc.models;
 
 import lombok.Getter;
 import lombok.Setter;
