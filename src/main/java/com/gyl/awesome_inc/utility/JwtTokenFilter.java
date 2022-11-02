@@ -1,11 +1,13 @@
 package com.gyl.awesome_inc.utility;
 
-import com.gyl.awesome_inc.service.CustomerService;
+import com.gyl.awesome_inc.domain.model.Customer;
+import com.gyl.awesome_inc.repository.CustomerRepo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -16,12 +18,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
     private final JwtTokenUtil jwtTokenUtil;
-    private final CustomerService customerService;
+    private final CustomerRepo customerRepo;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -63,6 +67,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private UserDetails getUserDetails(String token) {
         String[] jwtSubject = jwtTokenUtil.getSubject(token).split(",");
 
-        return customerService.loadUserByUsername(jwtSubject[1]);
+        Optional<Customer> customer = customerRepo.findByEmail(jwtSubject[1]);
+
+        if (customer.isEmpty()) {
+            throw new UsernameNotFoundException("User not found with email: " + jwtSubject[1]);
+        }
+
+        return new User(customer.get().getEmail(), customer.get().getPassword(), new ArrayList<>());
     }
 }

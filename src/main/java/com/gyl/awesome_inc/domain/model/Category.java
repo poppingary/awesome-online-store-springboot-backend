@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -22,9 +21,6 @@ public class Category {
 
     @Column(name = "subcategory", nullable = false, length = 20)
     private String subcategory;
-
-    @Column(name = "table_last_update", nullable = false)
-    private Instant tableLastUpdate;
 
     @OneToMany(mappedBy = "category")
     private Set<Product> products = new LinkedHashSet<>();

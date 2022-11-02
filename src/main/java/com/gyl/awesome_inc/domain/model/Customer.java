@@ -2,9 +2,9 @@ package com.gyl.awesome_inc.domain.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -14,6 +14,8 @@ import java.util.Set;
 @Table(name = "fa22_sg_customer")
 public class Customer {
     @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     @Column(name = "customer_id", nullable = false, length = 30)
     private String customerId;
 
@@ -34,9 +36,6 @@ public class Customer {
 
     @Column(name = "security_answer", nullable = false, length = 100)
     private String securityAnswer;
-
-    @Column(name = "table_last_update", nullable = false)
-    private Instant tableLastUpdate;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "security_question_id", nullable = false)

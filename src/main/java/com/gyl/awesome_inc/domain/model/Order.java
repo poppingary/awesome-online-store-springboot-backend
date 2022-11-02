@@ -27,11 +27,7 @@ public class Order {
     @Column(name = "is_returned", nullable = false, length = 1)
     private String isReturned;
 
-    @Column(name = "table_last_update", nullable = false)
-    private Instant tableLastUpdate;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customer customer;
-
 }

@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -26,9 +25,6 @@ public class Product {
 
     @Column(name = "discount", nullable = false, precision = 2, scale = 2)
     private BigDecimal discount;
-
-    @Column(name = "table_last_update", nullable = false)
-    private Instant tableLastUpdate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)

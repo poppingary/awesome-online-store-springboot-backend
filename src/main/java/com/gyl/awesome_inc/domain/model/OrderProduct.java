@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.Instant;
 
 @Getter
 @Setter
@@ -26,7 +25,4 @@ public class OrderProduct {
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
-
-    @Column(name = "table_last_update", nullable = false)
-    private Instant tableLastUpdate;
 }

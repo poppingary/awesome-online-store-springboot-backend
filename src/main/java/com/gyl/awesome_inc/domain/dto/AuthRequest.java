@@ -2,28 +2,29 @@ package com.gyl.awesome_inc.domain.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Length;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 @Getter
 @Setter
 public class AuthRequest implements Serializable {
-    @NotNull
+    @NotBlank
     @Email
-    @Length(min = 5, max = 50)
+    @Length(min = 10, max = 50)
     private String email;
 
-    @NotNull
-    @Length(min = 5, max = 20)
+    @NotBlank
+    @Length(min = 8, max = 20)
     private String password;
 
-    @NotNull
+    @NotBlank
+    @Length(max = 100)
     private String securityQuestion;
 
-    @NotNull
+    @NotBlank
+    @Length(max = 100)
     private String securityAnswer;
 }

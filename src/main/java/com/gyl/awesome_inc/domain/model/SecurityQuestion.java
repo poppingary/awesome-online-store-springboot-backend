@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -19,9 +18,6 @@ public class SecurityQuestion {
 
     @Column(name = "security_question", nullable = false, length = 100)
     private String securityQuestion;
-
-    @Column(name = "table_last_update", nullable = false)
-    private Instant tableLastUpdate;
 
     @OneToMany(mappedBy = "securityQuestion")
     private Set<Customer> customers = new LinkedHashSet<>();

@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.Instant;
 
 @Getter
 @Setter
@@ -29,9 +28,6 @@ public class CreditCard {
 
     @Column(name = "cvv", nullable = false, length = 10)
     private String cvv;
-
-    @Column(name = "table_last_update", nullable = false)
-    private Instant tableLastUpdate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")

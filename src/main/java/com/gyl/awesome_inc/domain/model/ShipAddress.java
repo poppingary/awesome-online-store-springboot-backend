@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.Instant;
 
 @Getter
 @Setter
@@ -36,9 +35,6 @@ public class ShipAddress {
 
     @Column(name = "market", nullable = false, length = 20)
     private String market;
-
-    @Column(name = "table_last_update", nullable = false)
-    private Instant tableLastUpdate;
 
     @Column(name = "is_primary", nullable = false, length = 1)
     private String isPrimary;
