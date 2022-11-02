@@ -1,4 +1,4 @@
-package com.gyl.awesome_inc.models;
+package com.gyl.awesome_inc.domain.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,7 +38,7 @@ public class Customer {
     @Column(name = "table_last_update", nullable = false)
     private Instant tableLastUpdate;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "security_question_id", nullable = false)
     private SecurityQuestion securityQuestion;
 

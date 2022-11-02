@@ -1,4 +1,4 @@
-package com.gyl.awesome_inc.models;
+package com.gyl.awesome_inc.domain.model;
 
 import lombok.Data;
 
