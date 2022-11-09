@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(path = "api/customer")
+@RequestMapping(path = "api/auth/customer")
 @RequiredArgsConstructor
 @CrossOrigin("http://localhost:4200")
 public class AuthApi {
@@ -35,7 +35,13 @@ public class AuthApi {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Customer customer = customerService.getCustomerByEmail(authRequest.getEmail());
+        Customer customer;
+        try {
+            customer = customerService.getCustomerByEmail(authRequest.getEmail());
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         if (!(customer.getSecurityQuestion().getSecurityQuestion().equals(authRequest.getSecurityQuestion()) && customer.getSecurityAnswer().equals(authRequest.getSecurityAnswer()))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

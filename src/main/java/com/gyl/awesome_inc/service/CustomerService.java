@@ -1,12 +1,9 @@
 package com.gyl.awesome_inc.service;
 
-import com.gyl.awesome_inc.domain.dto.RegisterRequest;
-import com.gyl.awesome_inc.domain.dto.RegisterResponse;
-import com.gyl.awesome_inc.domain.model.Customer;
-import com.gyl.awesome_inc.domain.model.SecurityQuestion;
-import com.gyl.awesome_inc.domain.model.ShipAddress;
-import com.gyl.awesome_inc.domain.model.ShipAddressId;
+import com.gyl.awesome_inc.domain.dto.*;
+import com.gyl.awesome_inc.domain.model.*;
 import com.gyl.awesome_inc.repository.CustomerRepo;
+import com.gyl.awesome_inc.repository.PasswordResetTokenRepo;
 import com.gyl.awesome_inc.repository.SecurityQuestionRepo;
 import com.gyl.awesome_inc.repository.ShipAddressRepo;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +16,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +33,7 @@ public class CustomerService implements UserDetailsService {
     private final SecurityQuestionRepo securityQuestionRepo;
     private final ModelMapper modelMapper;
     private final ShipAddressRepo shipAddressRepo;
+    private final PasswordResetTokenRepo passwordResetTokenRepo;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -43,7 +46,7 @@ public class CustomerService implements UserDetailsService {
         return new User(customer.get().getEmail(), customer.get().getPassword(), new ArrayList<>());
     }
 
-    public Customer getCustomerByEmail(String email) {
+    public Customer getCustomerByEmail(String email) throws UsernameNotFoundException {
         Optional<Customer> customer = customerRepo.findByEmail(email);
 
         if (customer.isEmpty()) {
@@ -103,5 +106,71 @@ public class CustomerService implements UserDetailsService {
         registerResponse.setIsPrimary(shipAddress.getIsPrimary());
 
         return registerResponse;
+    }
+
+    @Transactional
+    public ForgotPasswordResponse constructEmailAndCreateResetToken(Customer customer, ForgotPasswordRequest forgotPasswordRequest) {
+        String subject = "Reset password";
+        String token = UUID.randomUUID().toString();
+        String text = constructEmail(token, forgotPasswordRequest);
+        createResetToken(customer, token);
+
+        return new ForgotPasswordResponse(forgotPasswordRequest.getEmail(), subject, text);
+    }
+
+    private String constructEmail(String token, ForgotPasswordRequest forgotPasswordRequest) {
+        String clientUri = forgotPasswordRequest.getClientUri();
+        String resetUrl = new StringBuilder().append(clientUri).append("?token=").append(token).toString();
+        return new StringBuilder()
+                .append("<p>Hello,</p>")
+                .append("<p>You have requested to reset your password.</p>")
+                .append("<p>Click the link below to change your password:</p>")
+                .append("<p><a href=\"").append(resetUrl).append("\">Change my password</a></p>")
+                .append("<br>")
+                .append("<p>Ignore this email if you do remember your password, ")
+                .append("or you have not made the request.</p>").toString();
+    }
+
+    private void createResetToken(Customer customer, String token) {
+        PasswordResetToken passwordResetToken = passwordResetTokenRepo.findByCustomer(customer);
+        if (!ObjectUtils.isEmpty(passwordResetToken)) {
+            passwordResetTokenRepo.deleteByCustomer(customer);
+        }
+        passwordResetToken = new PasswordResetToken();
+        passwordResetToken.setToken(token);
+        passwordResetToken.setCustomer(customer);
+        passwordResetToken.setExpiryDate(Date.from(
+                LocalDateTime
+                        .now()
+                        .plusDays(1)
+                        .atZone(ZoneOffset.of("+00:00"))
+                        .toInstant()
+        ));
+        passwordResetTokenRepo.save(passwordResetToken);
+    }
+
+    @Transactional
+    public ResponseEntity<?> changePassword(ChangePasswordRequest changePasswordRequest) {
+        String token = changePasswordRequest.getResetToke();
+        if (!isResetTokenValid(token)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        String newPassword = bcryptEncoder.encode(changePasswordRequest.getNewPassword());
+        PasswordResetToken passwordResetToken = passwordResetTokenRepo.findByToken(token);
+        Customer customer = customerRepo.findById(passwordResetToken.getCustomer().getCustomerId()).get();
+        customer.setPassword(newPassword);
+        customerRepo.save(customer);
+
+        return ResponseEntity.ok().build();
+    }
+
+    private boolean isResetTokenValid(String token) {
+        PasswordResetToken passwordResetToken = passwordResetTokenRepo.findByToken(token);
+        LocalDateTime expiryDateLocal = passwordResetToken.getExpiryDate().toInstant()
+                .atZone(ZoneOffset.of("+00:00"))
+                .toLocalDateTime();
+
+        return LocalDateTime.now().isBefore(expiryDateLocal);
     }
 }
