@@ -17,7 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -106,6 +108,32 @@ public class CustomerService implements UserDetailsService {
         registerResponse.setIsPrimary(shipAddress.getIsPrimary());
 
         return registerResponse;
+    }
+
+    public ResponseEntity<?> getCustomerInfo(String customerId) {
+        Customer customer = customerRepo.findById(customerId).get();
+        GetCustomerInfoResponse getCustomerInfoResponse = modelMapper.map(customer, GetCustomerInfoResponse.class);
+        getCustomerInfoResponse.setSecurityQuestion(customer.getSecurityQuestion().getSecurityQuestion());
+
+        return ResponseEntity.ok().body(getCustomerInfoResponse);
+    }
+
+    @Transactional
+    public ResponseEntity<?> updateCustomerInfo(String customerId, UpdateCustomerInfoRequest updateCustomerInfoRequest) {
+        Customer customer = customerRepo.findById(customerId).get();
+        customer.setEmail(updateCustomerInfoRequest.getEmail());
+        customer.setFirstName(updateCustomerInfoRequest.getFirstName());
+        customer.setLastName(updateCustomerInfoRequest.getLastName());
+        String securityQuestionString = updateCustomerInfoRequest.getSecurityQuestion();
+        SecurityQuestion securityQuestion = securityQuestionRepo.findBySecurityQuestion(securityQuestionString).get();
+        customer.setSecurityQuestion(securityQuestion);
+        customer.setSecurityAnswer(updateCustomerInfoRequest.getSecurityAnswer());
+
+        Customer saveCustomer = customerRepo.save(customer);
+        UpdateCustomerInfoResponse updateCustomerInfoResponse = modelMapper.map(saveCustomer, UpdateCustomerInfoResponse.class);
+        updateCustomerInfoResponse.setSecurityQuestion(securityQuestionString);
+
+        return ResponseEntity.ok().body(updateCustomerInfoResponse);
     }
 
     @Transactional

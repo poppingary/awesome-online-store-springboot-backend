@@ -1,9 +1,6 @@
 package com.gyl.awesome_inc.api;
 
-import com.gyl.awesome_inc.domain.dto.ForgotPasswordRequest;
-import com.gyl.awesome_inc.domain.dto.ForgotPasswordResponse;
-import com.gyl.awesome_inc.domain.dto.RegisterRequest;
-import com.gyl.awesome_inc.domain.dto.ChangePasswordRequest;
+import com.gyl.awesome_inc.domain.dto.*;
 import com.gyl.awesome_inc.domain.model.Customer;
 import com.gyl.awesome_inc.service.CustomerService;
 import com.gyl.awesome_inc.service.EmailService;
@@ -28,6 +25,21 @@ public class CustomerAdminApi {
         return customerService.create(registerRequest);
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<?> get(@PathVariable String id) {
+        return customerService.getCustomerInfo(id);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<?> update(@PathVariable String id, @RequestBody @Valid UpdateCustomerInfoRequest updateCustomerInfoRequest) {
+        return customerService.updateCustomerInfo(id, updateCustomerInfoRequest);
+    }
+
+//    @DeleteMapping("{id}")
+//    public UserView delete(@PathVariable String id) {
+//        return userService.delete(new ObjectId(id));
+//    }
+
     @PostMapping(value = "/forgotPassword")
     public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordRequest forgotPasswordRequest) throws MessagingException {
         Customer customer;
@@ -47,19 +59,4 @@ public class CustomerAdminApi {
     public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
         return customerService.changePassword(changePasswordRequest);
     }
-
-//    @PutMapping("{id}")
-//    public UserView update(@PathVariable String id, @RequestBody @Valid UpdateUserRequest request) {
-//        return userService.update(new ObjectId(id), request);
-//    }
-//
-//    @DeleteMapping("{id}")
-//    public UserView delete(@PathVariable String id) {
-//        return userService.delete(new ObjectId(id));
-//    }
-//
-//    @GetMapping("{id}")
-//    public UserView get(@PathVariable String id) {
-//        return userService.getUser(new ObjectId(id));
-//    }
 }
