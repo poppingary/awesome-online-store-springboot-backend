@@ -16,10 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -111,22 +108,32 @@ public class CustomerService implements UserDetailsService {
     }
 
     public ResponseEntity<?> getCustomerInfo(String customerId) {
-        Customer customer = customerRepo.findById(customerId).get();
-        GetCustomerInfoResponse getCustomerInfoResponse = modelMapper.map(customer, GetCustomerInfoResponse.class);
-        getCustomerInfoResponse.setSecurityQuestion(customer.getSecurityQuestion().getSecurityQuestion());
+        Optional<Customer> customerOptional = customerRepo.findById(customerId);
+        if (customerOptional.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        GetCustomerInfoResponse getCustomerInfoResponse = modelMapper.map(customerOptional.get(), GetCustomerInfoResponse.class);
+        getCustomerInfoResponse.setSecurityQuestion(customerOptional.get().getSecurityQuestion().getSecurityQuestion());
 
         return ResponseEntity.ok().body(getCustomerInfoResponse);
     }
 
     @Transactional
     public ResponseEntity<?> updateCustomerInfo(String customerId, UpdateCustomerInfoRequest updateCustomerInfoRequest) {
-        Customer customer = customerRepo.findById(customerId).get();
+        Optional<Customer> customerOptional = customerRepo.findById(customerId);
+        if (customerOptional.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        Customer customer = customerOptional.get();
         customer.setEmail(updateCustomerInfoRequest.getEmail());
         customer.setFirstName(updateCustomerInfoRequest.getFirstName());
         customer.setLastName(updateCustomerInfoRequest.getLastName());
         String securityQuestionString = updateCustomerInfoRequest.getSecurityQuestion();
-        SecurityQuestion securityQuestion = securityQuestionRepo.findBySecurityQuestion(securityQuestionString).get();
-        customer.setSecurityQuestion(securityQuestion);
+        Optional<SecurityQuestion> securityQuestionOptional = securityQuestionRepo.findBySecurityQuestion(securityQuestionString);
+        if (securityQuestionOptional.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        customer.setSecurityQuestion(securityQuestionOptional.get());
         customer.setSecurityAnswer(updateCustomerInfoRequest.getSecurityAnswer());
 
         Customer saveCustomer = customerRepo.save(customer);
@@ -148,23 +155,22 @@ public class CustomerService implements UserDetailsService {
 
     private String constructEmail(String token, ForgotPasswordRequest forgotPasswordRequest) {
         String clientUri = forgotPasswordRequest.getClientUri();
-        String resetUrl = new StringBuilder().append(clientUri).append("?token=").append(token).toString();
-        return new StringBuilder()
-                .append("<p>Hello,</p>")
-                .append("<p>You have requested to reset your password.</p>")
-                .append("<p>Click the link below to change your password:</p>")
-                .append("<p><a href=\"").append(resetUrl).append("\">Change my password</a></p>")
-                .append("<br>")
-                .append("<p>Ignore this email if you do remember your password, ")
-                .append("or you have not made the request.</p>").toString();
+        String resetUrl = clientUri + "?token=" + token;
+        return "<p>Hello,</p>" +
+                "<p>You have requested to reset your password.</p>" +
+                "<p>Click the link below to change your password:</p>" +
+                "<p><a href=\"" + resetUrl + "\">Change my password</a></p>" +
+                "<br>" +
+                "<p>Ignore this email if you do remember your password, " +
+                "or you have not made the request.</p>";
     }
 
     private void createResetToken(Customer customer, String token) {
-        PasswordResetToken passwordResetToken = passwordResetTokenRepo.findByCustomer(customer);
-        if (!ObjectUtils.isEmpty(passwordResetToken)) {
+        Optional<PasswordResetToken> passwordResetTokenOptional = passwordResetTokenRepo.findByCustomer(customer);
+        if (passwordResetTokenOptional.isPresent()) {
             passwordResetTokenRepo.deleteByCustomer(customer);
         }
-        passwordResetToken = new PasswordResetToken();
+        PasswordResetToken passwordResetToken = new PasswordResetToken();
         passwordResetToken.setToken(token);
         passwordResetToken.setCustomer(customer);
         passwordResetToken.setExpiryDate(Date.from(
@@ -180,25 +186,32 @@ public class CustomerService implements UserDetailsService {
     @Transactional
     public ResponseEntity<?> changePassword(ChangePasswordRequest changePasswordRequest) {
         String token = changePasswordRequest.getResetToke();
-        if (!isResetTokenValid(token)) {
+        Optional<PasswordResetToken> passwordResetTokenOptional = passwordResetTokenRepo.findByToken(token);
+        if (passwordResetTokenOptional.isEmpty() || !isResetTokenValid(passwordResetTokenOptional.get())) {
             return ResponseEntity.badRequest().build();
         }
 
         String newPassword = bcryptEncoder.encode(changePasswordRequest.getNewPassword());
-        PasswordResetToken passwordResetToken = passwordResetTokenRepo.findByToken(token);
-        Customer customer = customerRepo.findById(passwordResetToken.getCustomer().getCustomerId()).get();
+        Optional<Customer> customerOptional = customerRepo.findById(passwordResetTokenOptional.get().getCustomer().getCustomerId());
+        if (customerOptional.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        Customer customer = customerOptional.get();
         customer.setPassword(newPassword);
         customerRepo.save(customer);
 
         return ResponseEntity.ok().build();
     }
 
-    private boolean isResetTokenValid(String token) {
-        PasswordResetToken passwordResetToken = passwordResetTokenRepo.findByToken(token);
+    private boolean isResetTokenValid(PasswordResetToken passwordResetToken) {
         LocalDateTime expiryDateLocal = passwordResetToken.getExpiryDate().toInstant()
                 .atZone(ZoneOffset.of("+00:00"))
                 .toLocalDateTime();
 
         return LocalDateTime.now().isBefore(expiryDateLocal);
     }
+
+//    public ResponseEntity<?> updatePassword(UpdatePasswordRequest updatePasswordRequest) {
+//        customerRepo.findById()
+//    }
 }

@@ -1,6 +1,5 @@
 package com.gyl.awesome_inc.domain.dto;
 
-import com.gyl.awesome_inc.domain.model.SecurityQuestion;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -11,6 +10,10 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 public class UpdateCustomerInfoRequest {
+    @NotBlank
+    @Length(max = 50)
+    private String customerId;
+
     @NotBlank
     @Email
     @Length(min = 10, max = 50)
