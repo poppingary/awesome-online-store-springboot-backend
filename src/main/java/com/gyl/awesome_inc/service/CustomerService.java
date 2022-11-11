@@ -211,7 +211,18 @@ public class CustomerService implements UserDetailsService {
         return LocalDateTime.now().isBefore(expiryDateLocal);
     }
 
-//    public ResponseEntity<?> updatePassword(UpdatePasswordRequest updatePasswordRequest) {
-//        customerRepo.findById()
-//    }
+    public ResponseEntity<?> updatePassword(UpdatePasswordRequest updatePasswordRequest) {
+        Optional<Customer> customerOptional = customerRepo.findById(updatePasswordRequest.getCustomerId());
+        if (customerOptional.isEmpty() ||
+                !bcryptEncoder.matches(updatePasswordRequest.getOldPassword(), customerOptional.get().getPassword())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Customer customer = customerOptional.get();
+        String newPassword = bcryptEncoder.encode(updatePasswordRequest.getNewPassword());
+        customer.setPassword(newPassword);
+        customerRepo.save(customer);
+
+        return ResponseEntity.ok().build();
+    }
 }

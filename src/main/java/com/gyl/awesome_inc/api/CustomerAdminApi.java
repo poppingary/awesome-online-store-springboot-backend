@@ -59,4 +59,9 @@ public class CustomerAdminApi {
     public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
         return customerService.changePassword(changePasswordRequest);
     }
+
+    @PutMapping(value = "/updatePassword")
+    public ResponseEntity<?> updatePassword(@RequestBody @Valid UpdatePasswordRequest updatePasswordRequest) {
+        return customerService.updatePassword(updatePasswordRequest);
+    }
 }
