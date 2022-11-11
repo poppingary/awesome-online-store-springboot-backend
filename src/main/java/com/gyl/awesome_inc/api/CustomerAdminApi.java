@@ -15,7 +15,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(path = "api/admin/customer")
 @RequiredArgsConstructor
-@CrossOrigin("http://localhost:4200")
+@CrossOrigin("http://localhost:3000")
 public class CustomerAdminApi {
     private final CustomerService customerService;
     private final EmailService emailService;
@@ -40,7 +40,7 @@ public class CustomerAdminApi {
 //        return userService.delete(new ObjectId(id));
 //    }
 
-    @PostMapping(value = "/forgotPassword")
+    @PostMapping(value = "/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordRequest forgotPasswordRequest) throws MessagingException {
         Customer customer;
         try {
@@ -55,13 +55,33 @@ public class CustomerAdminApi {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(value = "/changePassword")
+    @PostMapping(value = "/change-password")
     public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
         return customerService.changePassword(changePasswordRequest);
     }
 
-    @PutMapping(value = "/updatePassword")
+    @PutMapping(value = "/update-password")
     public ResponseEntity<?> updatePassword(@RequestBody @Valid UpdatePasswordRequest updatePasswordRequest) {
         return customerService.updatePassword(updatePasswordRequest);
     }
+
+//    @PostMapping(value = "/createAddress")
+//    public ResponseEntity<?> createAddress(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
+//
+//    }
+//
+//    @GetMapping(value = "/getAddress")
+//    public ResponseEntity<?> getAddress(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
+//
+//    }
+//
+//    @PutMapping(value = "/updateAddress")
+//    public ResponseEntity<?> updateAddress(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
+//
+//    }
+//
+//    @DeleteMapping(value = "/deleteAddress")
+//    public ResponseEntity<?> deleteAddress(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
+//
+//    }
 }
