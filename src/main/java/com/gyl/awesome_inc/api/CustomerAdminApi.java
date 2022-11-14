@@ -5,6 +5,7 @@ import com.gyl.awesome_inc.domain.model.Customer;
 import com.gyl.awesome_inc.service.CustomerService;
 import com.gyl.awesome_inc.service.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(path = "api/admin/customer")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000", exposedHeaders = HttpHeaders.AUTHORIZATION)
 public class CustomerAdminApi {
     private final CustomerService customerService;
     private final EmailService emailService;

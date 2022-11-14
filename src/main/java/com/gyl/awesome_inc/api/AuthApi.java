@@ -19,6 +19,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(path = "api/auth/customer")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000", exposedHeaders = HttpHeaders.AUTHORIZATION)
 public class AuthApi {
     private final AuthenticationManager authenticationManager;
     private final CustomerService customerService;
