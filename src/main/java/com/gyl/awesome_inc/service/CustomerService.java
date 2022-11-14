@@ -185,7 +185,7 @@ public class CustomerService implements UserDetailsService {
 
     @Transactional
     public ResponseEntity<?> changePassword(ChangePasswordRequest changePasswordRequest) {
-        String token = changePasswordRequest.getResetToke();
+        String token = changePasswordRequest.getResetToken();
         Optional<PasswordResetToken> passwordResetTokenOptional = passwordResetTokenRepo.findByToken(token);
         if (passwordResetTokenOptional.isEmpty() || !isResetTokenValid(passwordResetTokenOptional.get())) {
             return ResponseEntity.badRequest().build();

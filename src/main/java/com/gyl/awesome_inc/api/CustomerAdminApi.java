@@ -15,7 +15,6 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(path = "api/admin/customer")
 @RequiredArgsConstructor
-@CrossOrigin("http://localhost:3000")
 public class CustomerAdminApi {
     private final CustomerService customerService;
     private final EmailService emailService;
