@@ -1,6 +1,5 @@
 package com.gyl.awesome_inc.domain.dto;
 
-import com.gyl.awesome_inc.domain.model.SecurityQuestion;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

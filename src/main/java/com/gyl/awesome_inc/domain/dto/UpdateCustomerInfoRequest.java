@@ -11,10 +11,6 @@ import javax.validation.constraints.NotBlank;
 @Setter
 public class UpdateCustomerInfoRequest {
     @NotBlank
-    @Length(max = 50)
-    private String customerId;
-
-    @NotBlank
     @Email
     @Length(min = 10, max = 50)
     private String email;
