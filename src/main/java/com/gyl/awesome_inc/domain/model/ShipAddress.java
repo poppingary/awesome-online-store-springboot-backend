@@ -1,9 +1,13 @@
 package com.gyl.awesome_inc.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -11,11 +15,13 @@ import javax.persistence.*;
 @Table(name = "fa22_sg_ship_address")
 public class ShipAddress {
     @EmbeddedId
+    @JsonIgnore
     private ShipAddressId id;
 
     @MapsId("customerId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnore
     private Customer customer;
 
     @Column(name = "postal_code", length = 10)
@@ -38,4 +44,10 @@ public class ShipAddress {
 
     @Column(name = "is_primary", nullable = false, length = 1)
     private String isPrimary;
+
+    @Column(name = "last_modified", nullable = false)
+    private Instant lastModified;
+
+    @OneToMany(mappedBy = "shipAddress")
+    private Set<Order> fa22SgOrders = new LinkedHashSet<>();
 }

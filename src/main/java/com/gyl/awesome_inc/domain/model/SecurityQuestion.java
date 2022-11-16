@@ -2,8 +2,10 @@ package com.gyl.awesome_inc.domain.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -13,7 +15,9 @@ import java.util.Set;
 @Table(name = "fa22_sg_security_question")
 public class SecurityQuestion {
     @Id
-    @Column(name = "security_question_id", nullable = false, length = 30)
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @Column(name = "security_question_id", nullable = false, length = 50)
     private String id;
 
     @Column(name = "security_question", nullable = false, length = 100)
@@ -21,4 +25,7 @@ public class SecurityQuestion {
 
     @OneToMany(mappedBy = "securityQuestion")
     private Set<Customer> customers = new LinkedHashSet<>();
+
+    @Column(name = "last_modified", nullable = false)
+    private Instant lastModified;
 }

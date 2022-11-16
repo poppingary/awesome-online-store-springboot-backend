@@ -11,9 +11,9 @@ import java.io.Serializable;
 public class ShipAddressId implements Serializable {
     private static final long serialVersionUID = -3770428377293071143L;
 
-    @Column(name = "ship_address_id", nullable = false, length = 30)
+    @Column(name = "ship_address_id", nullable = false, length = 50)
     private String shipAddressId;
 
-    @Column(name = "customer_id", nullable = false, length = 30)
+    @Column(name = "customer_id", nullable = false, length = 50)
     private String customerId;
 }

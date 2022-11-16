@@ -11,9 +11,9 @@ import java.io.Serializable;
 public class OrderProductId implements Serializable {
     private static final long serialVersionUID = -6437228592092430174L;
 
-    @Column(name = "product_id", nullable = false, length = 30)
+    @Column(name = "product_id", nullable = false, length = 50)
     private String productId;
 
-    @Column(name = "order_id", nullable = false, length = 30)
+    @Column(name = "order_id", nullable = false, length = 50)
     private String orderId;
 }

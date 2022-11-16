@@ -2,8 +2,10 @@ package com.gyl.awesome_inc.domain.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -11,7 +13,9 @@ import javax.persistence.*;
 @Table(name = "fa22_sg_credit_card")
 public class CreditCard {
     @Id
-    @Column(name = "credit_card_id", nullable = false, length = 30)
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @Column(name = "credit_card_id", nullable = false, length = 50)
     private String id;
 
     @Column(name = "cardholder_first_name", nullable = false, length = 20)
@@ -32,4 +36,7 @@ public class CreditCard {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customer customer;
+
+    @Column(name = "last_modified", nullable = false)
+    private Instant lastModified;
 }
