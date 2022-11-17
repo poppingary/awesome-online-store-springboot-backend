@@ -50,9 +50,6 @@ public class Order {
     @Column(name = "is_returned", nullable = false, length = 1)
     private String isReturned;
 
-    @Column(name = "last_modified", nullable = false)
-    private Instant lastModified;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;

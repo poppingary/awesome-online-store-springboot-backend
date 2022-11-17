@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.Instant;
 
 @Getter
 @Setter
@@ -36,7 +35,4 @@ public class CreditCard {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customer customer;
-
-    @Column(name = "last_modified", nullable = false)
-    private Instant lastModified;
 }

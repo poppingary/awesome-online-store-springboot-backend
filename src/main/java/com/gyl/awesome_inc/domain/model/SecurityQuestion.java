@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -25,7 +24,4 @@ public class SecurityQuestion {
 
     @OneToMany(mappedBy = "securityQuestion")
     private Set<Customer> customers = new LinkedHashSet<>();
-
-    @Column(name = "last_modified", nullable = false)
-    private Instant lastModified;
 }

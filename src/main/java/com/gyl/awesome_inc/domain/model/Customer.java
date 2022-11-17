@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -50,9 +49,6 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer")
     private Set<Order> orders = new LinkedHashSet<>();
-
-    @Column(name = "last_modified", nullable = false)
-    private Instant lastModified;
 
     @OneToMany(mappedBy = "customer")
     private Set<PasswordResetToken> fa22SgPasswordResetTokens = new LinkedHashSet<>();
