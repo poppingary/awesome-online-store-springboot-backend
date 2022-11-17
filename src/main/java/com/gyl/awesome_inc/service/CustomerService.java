@@ -57,18 +57,18 @@ public class CustomerService implements UserDetailsService {
 
     @Transactional
     public ResponseEntity<?> create(RegisterRequest registerRequest) {
-        Customer newCustomer = createNewCustomer(registerRequest);
-        Customer saveCustomer = customerRepo.save(newCustomer);
+        Customer customer = createCustomer(registerRequest);
+        Customer saveCustomer = customerRepo.save(customer);
 
-        ShipAddress newShipAddress = createNewShipAddress(registerRequest, saveCustomer);
-        ShipAddress saveShipAddress = shipAddressRepo.save(newShipAddress);
+        ShipAddress shipAddress = createShipAddress(registerRequest, saveCustomer);
+        ShipAddress saveShipAddress = shipAddressRepo.save(shipAddress);
 
         RegisterResponse registerResponse = createRegisterResponse(saveCustomer, saveShipAddress);
 
         return ResponseEntity.ok().body(registerResponse);
     }
 
-    private Customer createNewCustomer(RegisterRequest registerRequest) {
+    private Customer createCustomer(RegisterRequest registerRequest) {
         Customer newCustomer = modelMapper.map(registerRequest, Customer.class);
         String encodePassword = bcryptEncoder.encode(registerRequest.getPassword());
         newCustomer.setPassword(encodePassword);
@@ -81,10 +81,9 @@ public class CustomerService implements UserDetailsService {
         return newCustomer;
     }
 
-    private ShipAddress createNewShipAddress(RegisterRequest registerRequest, Customer customer) {
-        long numOfAddress = shipAddressRepo.countByCustomer(customer);
+    private ShipAddress createShipAddress(RegisterRequest registerRequest, Customer customer) {
         ShipAddressId newShipAddressId = new ShipAddressId();
-        newShipAddressId.setShipAddressId(String.valueOf(numOfAddress + 1));
+        newShipAddressId.setShipAddressId(UUID.randomUUID().toString());
 
         ShipAddress newShipAddress = modelMapper.map(registerRequest, ShipAddress.class);
         newShipAddress.setId(newShipAddressId);
