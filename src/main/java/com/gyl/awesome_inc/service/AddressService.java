@@ -1,6 +1,8 @@
 package com.gyl.awesome_inc.service;
 
 import com.gyl.awesome_inc.domain.dto.CreateAddressRequest;
+import com.gyl.awesome_inc.domain.dto.CreateAddressResponse;
+import com.gyl.awesome_inc.domain.dto.GetAddressResponse;
 import com.gyl.awesome_inc.domain.model.Customer;
 import com.gyl.awesome_inc.domain.model.ShipAddress;
 import com.gyl.awesome_inc.domain.model.ShipAddressId;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -45,8 +48,31 @@ public class AddressService {
         newShipAddress.setCustomer(customer);
         ShipAddress saveShipAddress = shipAddressRepo.save(newShipAddress);
         shipAddressSet.add(saveShipAddress);
+        Set<CreateAddressResponse> createAddressResponseSet = new HashSet<>();
+        for (ShipAddress address : shipAddressSet) {
+            CreateAddressResponse createAddressResponse = modelMapper.map(address, CreateAddressResponse.class);
+            createAddressResponse.setShipAddressId(address.getId().getShipAddressId());
+            createAddressResponseSet.add(createAddressResponse);
+        }
 
-        return ResponseEntity.ok().body(shipAddressSet);
+        return ResponseEntity.ok().body(createAddressResponseSet);
+    }
+
+    public ResponseEntity<?> getAddress(String id) {
+        Optional<Customer> customerOptional = customerRepo.findById(id);
+        if (customerOptional.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        Set<ShipAddress> shipAddressSet = customerOptional.get().getShipAddresses();
+
+        Set<GetAddressResponse> getAddressResponseSet = new HashSet<>();
+        for (ShipAddress address : shipAddressSet) {
+            GetAddressResponse getAddressResponse = modelMapper.map(address, GetAddressResponse.class);
+            getAddressResponse.setShipAddressId(address.getId().getShipAddressId());
+            getAddressResponseSet.add(getAddressResponse);
+        }
+
+        return ResponseEntity.ok().body(getAddressResponseSet);
     }
 
 //    @GetMapping(value = "/getAddress")

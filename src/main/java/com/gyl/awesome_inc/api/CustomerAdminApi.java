@@ -36,11 +36,6 @@ public class CustomerAdminApi {
         return customerService.updateCustomerInfo(id, updateCustomerInfoRequest);
     }
 
-//    @DeleteMapping("{id}")
-//    public UserView delete(@PathVariable String id) {
-//        return userService.delete(new ObjectId(id));
-//    }
-
     @PostMapping(value = "/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordRequest forgotPasswordRequest) throws MessagingException {
         Customer customer;
