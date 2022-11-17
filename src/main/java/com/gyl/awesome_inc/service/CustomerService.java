@@ -192,7 +192,7 @@ public class CustomerService implements UserDetailsService {
         }
 
         String newPassword = bcryptEncoder.encode(changePasswordRequest.getNewPassword());
-        Optional<Customer> customerOptional = customerRepo.findById(passwordResetTokenOptional.get().getCustomer().getCustomerId());
+        Optional<Customer> customerOptional = customerRepo.findById(passwordResetTokenOptional.get().getCustomer().getId());
         if (customerOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }

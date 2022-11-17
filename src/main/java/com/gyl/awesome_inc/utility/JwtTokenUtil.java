@@ -22,7 +22,7 @@ public class JwtTokenUtil implements Serializable {
 
     public String generateAccessToken(Customer customer) {
         return Jwts.builder()
-                .setSubject(String.format("%s,%s", customer.getCustomerId(), customer.getEmail()))
+                .setSubject(String.format("%s,%s", customer.getId(), customer.getEmail()))
                 .setIssuer("GYL")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiredTime * 1000))

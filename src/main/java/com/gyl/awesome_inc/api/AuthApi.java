@@ -47,7 +47,7 @@ public class AuthApi {
         }
 
         String accessToken = jwtTokenUtil.generateAccessToken(customer);
-        AuthResponse authResponse = new AuthResponse(customer.getCustomerId(), customer.getFirstName(), customer.getLastName());
+        AuthResponse authResponse = new AuthResponse(customer.getId(), customer.getFirstName(), customer.getLastName());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
