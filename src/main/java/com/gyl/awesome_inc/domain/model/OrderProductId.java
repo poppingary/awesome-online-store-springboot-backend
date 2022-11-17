@@ -4,11 +4,13 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import java.io.Serial;
 import java.io.Serializable;
 
 @Data
 @Embeddable
 public class OrderProductId implements Serializable {
+    @Serial
     private static final long serialVersionUID = -6437228592092430174L;
 
     @Column(name = "product_id", nullable = false, length = 50)

@@ -2,6 +2,7 @@ package com.gyl.awesome_inc.domain.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -13,19 +14,35 @@ import java.util.Set;
 @Entity
 @Table(name = "fa22_sg_order")
 public class Order {
-    @EmbeddedId
-    private OrderId id;
-
-    @MapsId
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ship_address_id", nullable = false, referencedColumnName = "ship_address_id")
-    private ShipAddress shipAddress;
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @Column(name = "order_id", nullable = false, length = 50)
+    private String id;
 
     @Column(name = "order_date", nullable = false)
     private Instant orderDate;
 
     @Column(name = "ship_mode", nullable = false, length = 30)
     private String shipMode;
+
+    @Column(name = "postal_code", length = 10)
+    private String postalCode;
+
+    @Column(name = "city", length = 50)
+    private String city;
+
+    @Column(name = "state", length = 50)
+    private String state;
+
+    @Column(name = "country", length = 50)
+    private String country;
+
+    @Column(name = "region", nullable = false, length = 20)
+    private String region;
+
+    @Column(name = "market", nullable = false, length = 20)
+    private String market;
 
     @Column(name = "order_priority", nullable = false, length = 30)
     private String orderPriority;
@@ -42,5 +59,4 @@ public class Order {
 
     @OneToMany(mappedBy = "order")
     private Set<OrderProduct> OrderProducts = new LinkedHashSet<>();
-
 }

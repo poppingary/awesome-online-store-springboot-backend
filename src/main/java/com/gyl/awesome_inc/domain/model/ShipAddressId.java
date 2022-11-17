@@ -4,11 +4,13 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import java.io.Serial;
 import java.io.Serializable;
 
 @Data
 @Embeddable
 public class ShipAddressId implements Serializable {
+    @Serial
     private static final long serialVersionUID = -3770428377293071143L;
 
     @Column(name = "ship_address_id", nullable = false, length = 50)

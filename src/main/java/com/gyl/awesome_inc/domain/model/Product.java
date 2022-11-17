@@ -30,6 +30,9 @@ public class Product {
     @Column(name = "discount", nullable = false, precision = 2, scale = 2)
     private BigDecimal discount;
 
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
