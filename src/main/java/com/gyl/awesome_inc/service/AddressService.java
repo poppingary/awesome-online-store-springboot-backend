@@ -2,10 +2,10 @@ package com.gyl.awesome_inc.service;
 
 import com.gyl.awesome_inc.domain.dto.CreateAddressRequest;
 import com.gyl.awesome_inc.domain.dto.CreateAddressResponse;
+import com.gyl.awesome_inc.domain.dto.GetAddressByCustomerIdResponse;
 import com.gyl.awesome_inc.domain.dto.GetAddressResponse;
 import com.gyl.awesome_inc.domain.model.Customer;
 import com.gyl.awesome_inc.domain.model.ShipAddress;
-import com.gyl.awesome_inc.domain.model.ShipAddressId;
 import com.gyl.awesome_inc.repository.CustomerRepo;
 import com.gyl.awesome_inc.repository.ShipAddressRepo;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class AddressService {
         Set<CreateAddressResponse> createAddressResponseSet = new HashSet<>();
         for (ShipAddress address : shipAddressSet) {
             CreateAddressResponse createAddressResponse = modelMapper.map(address, CreateAddressResponse.class);
-            createAddressResponse.setShipAddressId(address.getId().getShipAddressId());
+            createAddressResponse.setShipAddressId(address.getId());
             createAddressResponseSet.add(createAddressResponse);
         }
 
@@ -63,29 +63,37 @@ public class AddressService {
 
     private ShipAddress createNewShipAddress(CreateAddressRequest createAddressRequest, Customer customer) {
         ShipAddress shipAddress = modelMapper.map(createAddressRequest, ShipAddress.class);
-        ShipAddressId shipAddressId = new ShipAddressId();
-        shipAddressId.setCustomerId(createAddressRequest.getCustomerId());
-        shipAddressId.setShipAddressId(UUID.randomUUID().toString());
-        shipAddress.setId(shipAddressId);
+        shipAddress.setId(UUID.randomUUID().toString());
         shipAddress.setCustomer(customer);
 
         return shipAddress;
     }
 
-    public ResponseEntity<?> getAddress(String id) {
+    public ResponseEntity<?> get(String id) {
+        Optional<ShipAddress> shipAddressOptional = shipAddressRepo.findById(id);
+        if (shipAddressOptional.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        ShipAddress shipAddress = shipAddressOptional.get();
+        GetAddressResponse getAddressResponse = modelMapper.map(shipAddress, GetAddressResponse.class);
+
+        return ResponseEntity.ok().body(getAddressResponse);
+    }
+
+    public ResponseEntity<?> getByCustomerId(String id) {
         Optional<Customer> customerOptional = customerRepo.findById(id);
         if (customerOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
         Set<ShipAddress> shipAddressSet = customerOptional.get().getShipAddresses();
 
-        Set<GetAddressResponse> getAddressResponseSet = new HashSet<>();
+        Set<GetAddressByCustomerIdResponse> getAddressByCustomerIdResponseSet = new HashSet<>();
         for (ShipAddress address : shipAddressSet) {
-            GetAddressResponse getAddressResponse = modelMapper.map(address, GetAddressResponse.class);
-            getAddressResponse.setShipAddressId(address.getId().getShipAddressId());
-            getAddressResponseSet.add(getAddressResponse);
+            GetAddressByCustomerIdResponse getAddressByCustomerIdResponse = modelMapper.map(address, GetAddressByCustomerIdResponse.class);
+            getAddressByCustomerIdResponse.setShipAddressId(address.getId());
+            getAddressByCustomerIdResponseSet.add(getAddressByCustomerIdResponse);
         }
 
-        return ResponseEntity.ok().body(getAddressResponseSet);
+        return ResponseEntity.ok().body(getAddressByCustomerIdResponseSet);
     }
 }

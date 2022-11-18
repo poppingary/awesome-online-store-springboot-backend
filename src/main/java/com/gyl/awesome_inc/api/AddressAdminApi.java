@@ -1,7 +1,6 @@
 package com.gyl.awesome_inc.api;
 
 import com.gyl.awesome_inc.domain.dto.CreateAddressRequest;
-import com.gyl.awesome_inc.domain.dto.UpdateCustomerInfoRequest;
 import com.gyl.awesome_inc.service.AddressService;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
@@ -24,16 +23,21 @@ public class AddressAdminApi {
 
     @GetMapping("{id}")
     public ResponseEntity<?> get(@PathVariable String id) {
-        return addressService.getAddress(id);
+        return addressService.get(id);
     }
 
 //    @PutMapping("{id}")
 //    public ResponseEntity<?> update(@PathVariable String id, @RequestBody @Valid UpdateCustomerInfoRequest updateCustomerInfoRequest) {
-//        return customerService.updateCustomerInfo(id, updateCustomerInfoRequest);
+//        return addressService.update(id, updateCustomerInfoRequest);
+//    }
+//
+//    @DeleteMapping("{id}")
+//    public ResponseEntity<?>  delete(@PathVariable String id) {
+//        return addressService.delete(new ObjectId(id));
 //    }
 
-//    @DeleteMapping("{id}")
-//    public UserView delete(@PathVariable String id) {
-//        return userService.delete(new ObjectId(id));
-//    }
+    @GetMapping
+    public ResponseEntity<?> getAddressByCustomerId(@RequestParam String customerId) {
+        return addressService.getByCustomerId(customerId);
+    }
 }

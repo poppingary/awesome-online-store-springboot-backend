@@ -1,6 +1,5 @@
 package com.gyl.awesome_inc.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,15 +10,9 @@ import javax.persistence.*;
 @Entity
 @Table(name = "fa22_sg_ship_address")
 public class ShipAddress {
-    @EmbeddedId
-    @JsonIgnore
-    private ShipAddressId id;
-
-    @MapsId("customerId")
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "customer_id", nullable = false)
-    @JsonIgnore
-    private Customer customer;
+    @Id
+    @Column(name = "ship_address_id", nullable = false, length = 50)
+    private String id;
 
     @Column(name = "postal_code", length = 10)
     private String postalCode;
@@ -38,6 +31,10 @@ public class ShipAddress {
 
     @Column(name = "market", nullable = false, length = 20)
     private String market;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
     @Column(name = "is_primary", nullable = false, length = 1)
     private String isPrimary;

@@ -5,7 +5,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class GetAddressResponse {
+public class GetAddressByCustomerIdResponse {
+    private String shipAddressId;
     private String postalCode;
     private String city;
     private String state;

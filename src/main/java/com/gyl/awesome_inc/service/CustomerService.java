@@ -85,11 +85,8 @@ public class CustomerService implements UserDetailsService {
     }
 
     private ShipAddress createShipAddress(RegisterRequest registerRequest, Customer customer) {
-        ShipAddressId newShipAddressId = new ShipAddressId();
-        newShipAddressId.setShipAddressId(UUID.randomUUID().toString());
-
         ShipAddress newShipAddress = modelMapper.map(registerRequest, ShipAddress.class);
-        newShipAddress.setId(newShipAddressId);
+        newShipAddress.setId(UUID.randomUUID().toString());
         newShipAddress.setCustomer(customer);
 
         return newShipAddress;
