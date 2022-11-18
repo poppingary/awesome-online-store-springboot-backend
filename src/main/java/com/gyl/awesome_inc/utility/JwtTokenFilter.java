@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.annotation.Nonnull;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +29,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final CustomerRepo customerRepo;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain filterChain) throws ServletException, IOException {
         if (!hasAuthorizationBearer(request)) {
             filterChain.doFilter(request, response);
             return;
@@ -68,7 +69,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String[] jwtSubject = jwtTokenUtil.getSubject(token).split(",");
 
         Optional<Customer> customer = customerRepo.findByEmail(jwtSubject[1]);
-
         if (customer.isEmpty()) {
             throw new UsernameNotFoundException("User not found with email: " + jwtSubject[1]);
         }

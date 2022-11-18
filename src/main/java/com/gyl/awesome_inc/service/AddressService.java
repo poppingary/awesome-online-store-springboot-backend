@@ -28,25 +28,13 @@ public class AddressService {
 
     @Transactional
     public ResponseEntity<?> create(CreateAddressRequest createAddressRequest) {
-        String customerId = createAddressRequest.getCustomerId();
-        Optional<Customer> customerOptional = customerRepo.findById(customerId);
+        Optional<Customer> customerOptional = customerRepo.findById(createAddressRequest.getCustomerId());
         if (customerOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
         Customer customer = customerOptional.get();
         Set<ShipAddress> shipAddressSet = customer.getShipAddresses();
-        if (createAddressRequest.getIsPrimary().equals("Y") && !shipAddressSet.isEmpty()) {
-            for (ShipAddress address : shipAddressSet) {
-                address.setIsPrimary("N");
-            }
-        }
-        ShipAddress newShipAddress = modelMapper.map(createAddressRequest, ShipAddress.class);
-        ShipAddressId shipAddressId = new ShipAddressId();
-        shipAddressId.setCustomerId(customerId);
-        shipAddressId.setShipAddressId(UUID.randomUUID().toString());
-        newShipAddress.setId(shipAddressId);
-        newShipAddress.setCustomer(customer);
-        ShipAddress saveShipAddress = shipAddressRepo.save(newShipAddress);
+        ShipAddress saveShipAddress = saveNewShipAddress(createAddressRequest, shipAddressSet, customer);
         shipAddressSet.add(saveShipAddress);
         Set<CreateAddressResponse> createAddressResponseSet = new HashSet<>();
         for (ShipAddress address : shipAddressSet) {
@@ -56,6 +44,32 @@ public class AddressService {
         }
 
         return ResponseEntity.ok().body(createAddressResponseSet);
+    }
+
+    private ShipAddress saveNewShipAddress(CreateAddressRequest createAddressRequest, Set<ShipAddress> shipAddressSet, Customer customer) {
+        setPrimaryAddress(createAddressRequest, shipAddressSet);
+        ShipAddress shipAddress = createNewShipAddress(createAddressRequest, customer);
+
+        return shipAddressRepo.save(shipAddress);
+    }
+
+    private void setPrimaryAddress(CreateAddressRequest createAddressRequest, Set<ShipAddress> shipAddressSet) {
+        if (createAddressRequest.getIsPrimary().equals("Y") && !shipAddressSet.isEmpty()) {
+            for (ShipAddress address : shipAddressSet) {
+                address.setIsPrimary("N");
+            }
+        }
+    }
+
+    private ShipAddress createNewShipAddress(CreateAddressRequest createAddressRequest, Customer customer) {
+        ShipAddress shipAddress = modelMapper.map(createAddressRequest, ShipAddress.class);
+        ShipAddressId shipAddressId = new ShipAddressId();
+        shipAddressId.setCustomerId(createAddressRequest.getCustomerId());
+        shipAddressId.setShipAddressId(UUID.randomUUID().toString());
+        shipAddress.setId(shipAddressId);
+        shipAddress.setCustomer(customer);
+
+        return shipAddress;
     }
 
     public ResponseEntity<?> getAddress(String id) {
@@ -74,19 +88,4 @@ public class AddressService {
 
         return ResponseEntity.ok().body(getAddressResponseSet);
     }
-
-//    @GetMapping(value = "/getAddress")
-//    public ResponseEntity<?> getAddress(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
-//
-//    }
-//
-//    @PutMapping(value = "/updateAddress")
-//    public ResponseEntity<?> updateAddress(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
-//
-//    }
-//
-//    @DeleteMapping(value = "/deleteAddress")
-//    public ResponseEntity<?> deleteAddress(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
-//
-//    }
 }

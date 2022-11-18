@@ -9,6 +9,7 @@ import com.gyl.awesome_inc.repository.ShipAddressRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -27,12 +29,13 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CustomerService implements UserDetailsService {
+    private final EmailService emailService;
     private final CustomerRepo customerRepo;
     private final PasswordEncoder bcryptEncoder;
     private final SecurityQuestionRepo securityQuestionRepo;
-    private final ModelMapper modelMapper;
     private final ShipAddressRepo shipAddressRepo;
     private final PasswordResetTokenRepo passwordResetTokenRepo;
+    private final ModelMapper modelMapper;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -57,7 +60,7 @@ public class CustomerService implements UserDetailsService {
 
     @Transactional
     public ResponseEntity<?> create(RegisterRequest registerRequest) {
-        Customer customer = createCustomer(registerRequest);
+        Customer customer = createNewCustomer(registerRequest);
         Customer saveCustomer = customerRepo.save(customer);
 
         ShipAddress shipAddress = createShipAddress(registerRequest, saveCustomer);
@@ -68,7 +71,7 @@ public class CustomerService implements UserDetailsService {
         return ResponseEntity.ok().body(registerResponse);
     }
 
-    private Customer createCustomer(RegisterRequest registerRequest) {
+    private Customer createNewCustomer(RegisterRequest registerRequest) {
         Customer newCustomer = modelMapper.map(registerRequest, Customer.class);
         String encodePassword = bcryptEncoder.encode(registerRequest.getPassword());
         newCustomer.setPassword(encodePassword);
@@ -106,7 +109,7 @@ public class CustomerService implements UserDetailsService {
         return registerResponse;
     }
 
-    public ResponseEntity<?> getCustomerInfo(String customerId) {
+    public ResponseEntity<?> get(String customerId) {
         Optional<Customer> customerOptional = customerRepo.findById(customerId);
         if (customerOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -118,7 +121,7 @@ public class CustomerService implements UserDetailsService {
     }
 
     @Transactional
-    public ResponseEntity<?> updateCustomerInfo(String customerId, UpdateCustomerInfoRequest updateCustomerInfoRequest) {
+    public ResponseEntity<?> update(String customerId, UpdateCustomerInfoRequest updateCustomerInfoRequest) {
         Optional<Customer> customerOptional = customerRepo.findById(customerId);
         if (customerOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -143,16 +146,30 @@ public class CustomerService implements UserDetailsService {
     }
 
     @Transactional
-    public ForgotPasswordResponse constructEmailAndCreateResetToken(Customer customer, ForgotPasswordRequest forgotPasswordRequest) {
+    public ResponseEntity<?> forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws MessagingException {
+        Customer customer;
+        try {
+            customer = getCustomerByEmail(forgotPasswordRequest.getEmail());
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        ForgotPasswordResponse forgotPasswordResponse = constructEmailAndCreateResetToken(customer, forgotPasswordRequest);
+        emailService.sendSimpleMessage(forgotPasswordResponse.getEmail(), forgotPasswordResponse.getSubject(), forgotPasswordResponse.getText());
+
+        return ResponseEntity.ok().build();
+    }
+
+    private ForgotPasswordResponse constructEmailAndCreateResetToken(Customer customer, ForgotPasswordRequest forgotPasswordRequest) {
         String subject = "Reset password";
         String token = UUID.randomUUID().toString();
-        String text = constructEmail(token, forgotPasswordRequest);
+        String text = constructText(token, forgotPasswordRequest);
         createResetToken(customer, token);
 
         return new ForgotPasswordResponse(forgotPasswordRequest.getEmail(), subject, text);
     }
 
-    private String constructEmail(String token, ForgotPasswordRequest forgotPasswordRequest) {
+    private String constructText(String token, ForgotPasswordRequest forgotPasswordRequest) {
         String clientUri = forgotPasswordRequest.getClientUri();
         String resetUrl = clientUri + "?token=" + token;
         return "<p>Hello,</p>" +
@@ -166,10 +183,7 @@ public class CustomerService implements UserDetailsService {
 
     private void createResetToken(Customer customer, String token) {
         Optional<PasswordResetToken> passwordResetTokenOptional = passwordResetTokenRepo.findByCustomer(customer);
-        if (passwordResetTokenOptional.isPresent()) {
-            passwordResetTokenRepo.deleteByCustomer(customer);
-        }
-        PasswordResetToken passwordResetToken = new PasswordResetToken();
+        PasswordResetToken passwordResetToken = passwordResetTokenOptional.orElseGet(PasswordResetToken::new);
         passwordResetToken.setToken(token);
         passwordResetToken.setCustomer(customer);
         passwordResetToken.setExpiryDate(Date.from(
@@ -189,15 +203,12 @@ public class CustomerService implements UserDetailsService {
         if (passwordResetTokenOptional.isEmpty() || !isResetTokenValid(passwordResetTokenOptional.get())) {
             return ResponseEntity.badRequest().build();
         }
-
-        String newPassword = bcryptEncoder.encode(changePasswordRequest.getNewPassword());
         Optional<Customer> customerOptional = customerRepo.findById(passwordResetTokenOptional.get().getCustomer().getId());
         if (customerOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        Customer customer = customerOptional.get();
-        customer.setPassword(newPassword);
-        customerRepo.save(customer);
+
+        saveNewPassword(customerOptional.get(), changePasswordRequest.getNewPassword());
 
         return ResponseEntity.ok().build();
     }
@@ -217,11 +228,13 @@ public class CustomerService implements UserDetailsService {
             return ResponseEntity.badRequest().build();
         }
 
-        Customer customer = customerOptional.get();
-        String newPassword = bcryptEncoder.encode(updatePasswordRequest.getNewPassword());
-        customer.setPassword(newPassword);
-        customerRepo.save(customer);
+        saveNewPassword(customerOptional.get(), updatePasswordRequest.getNewPassword());
 
         return ResponseEntity.ok().build();
+    }
+
+    private void saveNewPassword(Customer customer, String newPassword) {
+        customer.setPassword(bcryptEncoder.encode(newPassword));
+        customerRepo.save(customer);
     }
 }

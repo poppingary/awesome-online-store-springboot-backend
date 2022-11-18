@@ -19,7 +19,6 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "http://localhost:3000", exposedHeaders = HttpHeaders.AUTHORIZATION)
 public class CustomerAdminApi {
     private final CustomerService customerService;
-    private final EmailService emailService;
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid RegisterRequest registerRequest) {
@@ -28,27 +27,17 @@ public class CustomerAdminApi {
 
     @GetMapping("{id}")
     public ResponseEntity<?> get(@PathVariable String id) {
-        return customerService.getCustomerInfo(id);
+        return customerService.get(id);
     }
 
     @PutMapping("{id}")
     public ResponseEntity<?> update(@PathVariable String id, @RequestBody @Valid UpdateCustomerInfoRequest updateCustomerInfoRequest) {
-        return customerService.updateCustomerInfo(id, updateCustomerInfoRequest);
+        return customerService.update(id, updateCustomerInfoRequest);
     }
 
     @PostMapping(value = "/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody @Valid ForgotPasswordRequest forgotPasswordRequest) throws MessagingException {
-        Customer customer;
-        try {
-            customer = customerService.getCustomerByEmail(forgotPasswordRequest.getEmail());
-        } catch (BadCredentialsException ex) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        ForgotPasswordResponse forgotPasswordResponse = customerService.constructEmailAndCreateResetToken(customer, forgotPasswordRequest);
-        emailService.sendSimpleMessage(forgotPasswordResponse.getEmail(), forgotPasswordResponse.getSubject(), forgotPasswordResponse.getText());
-
-        return ResponseEntity.ok().build();
+        return customerService.forgotPassword(forgotPasswordRequest);
     }
 
     @PostMapping(value = "/change-password")
@@ -60,24 +49,4 @@ public class CustomerAdminApi {
     public ResponseEntity<?> updatePassword(@RequestBody @Valid UpdatePasswordRequest updatePasswordRequest) {
         return customerService.updatePassword(updatePasswordRequest);
     }
-
-//    @PostMapping(value = "/createAddress")
-//    public ResponseEntity<?> createAddress(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
-//
-//    }
-//
-//    @GetMapping(value = "/getAddress")
-//    public ResponseEntity<?> getAddress(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
-//
-//    }
-//
-//    @PutMapping(value = "/updateAddress")
-//    public ResponseEntity<?> updateAddress(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
-//
-//    }
-//
-//    @DeleteMapping(value = "/deleteAddress")
-//    public ResponseEntity<?> deleteAddress(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
-//
-//    }
 }

@@ -9,5 +9,4 @@ import java.util.Optional;
 public interface PasswordResetTokenRepo extends CrudRepository<PasswordResetToken, String> {
     Optional<PasswordResetToken> findByCustomer(Customer customer);
     Optional<PasswordResetToken> findByToken(String token);
-    void deleteByCustomer(Customer customer);
 }
