@@ -1,9 +1,6 @@
 package com.gyl.awesome_inc.service;
 
-import com.gyl.awesome_inc.domain.dto.CreateAddressRequest;
-import com.gyl.awesome_inc.domain.dto.CreateAddressResponse;
-import com.gyl.awesome_inc.domain.dto.GetAddressByCustomerIdResponse;
-import com.gyl.awesome_inc.domain.dto.GetAddressResponse;
+import com.gyl.awesome_inc.domain.dto.*;
 import com.gyl.awesome_inc.domain.model.Customer;
 import com.gyl.awesome_inc.domain.model.ShipAddress;
 import com.gyl.awesome_inc.repository.CustomerRepo;
@@ -78,6 +75,30 @@ public class AddressService {
         GetAddressResponse getAddressResponse = modelMapper.map(shipAddress, GetAddressResponse.class);
 
         return ResponseEntity.ok().body(getAddressResponse);
+    }
+
+    public ResponseEntity<?> update(String id, UpdateAddressRequest updateShipAddressRequest) {
+        Optional<ShipAddress> shipAddressOptional = shipAddressRepo.findById(id);
+        if (shipAddressOptional.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        ShipAddress shipAddress = shipAddressOptional.get();
+        shipAddress.setPostalCode(updateShipAddressRequest.getPostalCode());
+        shipAddress.setCity(updateShipAddressRequest.getCity());
+        shipAddress.setState(updateShipAddressRequest.getState());
+        shipAddress.setCountry(updateShipAddressRequest.getCountry());
+        shipAddress.setRegion(updateShipAddressRequest.getRegion());
+        shipAddress.setMarket(updateShipAddressRequest.getMarket());
+        shipAddress.setIsPrimary(updateShipAddressRequest.getIsPrimary());
+        ShipAddress saveShipAddress = shipAddressRepo.save(shipAddress);
+        UpdateAddressResponse updateAddressResponse = modelMapper.map(saveShipAddress, UpdateAddressResponse.class);
+
+        return ResponseEntity.ok().body(updateAddressResponse);
+    }
+
+    public ResponseEntity<?> delete(String id) {
+        shipAddressRepo.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<?> getByCustomerId(String id) {
