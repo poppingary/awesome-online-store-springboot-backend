@@ -17,4 +17,9 @@ public class ProductApi {
     public ResponseEntity<?> getKeyword(@RequestParam String q) {
         return productService.getKeyword(q);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestParam String q) {
+        return productService.search(q);
+    }
 }
