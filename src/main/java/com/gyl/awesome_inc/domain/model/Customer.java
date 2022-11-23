@@ -52,4 +52,7 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer")
     private Set<PasswordResetToken> fa22SgPasswordResetTokens = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "customer")
+    private Set<CustomerProduct> CustomerProducts = new LinkedHashSet<>();
 }

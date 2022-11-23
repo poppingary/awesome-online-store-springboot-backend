@@ -41,4 +41,7 @@ public class Product {
     @OneToMany(mappedBy = "product")
     @JsonIgnore
     private Set<OrderProduct> orderProducts = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "product")
+    private Set<CustomerProduct> CustomerProducts = new LinkedHashSet<>();
 }
