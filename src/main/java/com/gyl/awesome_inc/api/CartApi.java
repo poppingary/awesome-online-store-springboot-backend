@@ -1,6 +1,8 @@
 package com.gyl.awesome_inc.api;
 
 import com.gyl.awesome_inc.domain.dto.AddToCartRequest;
+import com.gyl.awesome_inc.domain.dto.DeleteCartRequest;
+import com.gyl.awesome_inc.domain.dto.UpdateCartRequest;
 import com.gyl.awesome_inc.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
@@ -24,5 +26,15 @@ public class CartApi {
     @GetMapping("{id}")
     public ResponseEntity<?> get(@PathVariable String id) {
         return cartService.get(id);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<?> update(@PathVariable String id, @RequestBody @Valid UpdateCartRequest updateCartRequest) {
+        return cartService.update(id, updateCartRequest);
+    }
+    
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> delete(@PathVariable String id, @RequestBody @Valid DeleteCartRequest deleteCartRequest) {
+        return cartService.delete(id, deleteCartRequest);
     }
 }

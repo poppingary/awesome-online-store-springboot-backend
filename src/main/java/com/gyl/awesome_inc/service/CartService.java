@@ -1,10 +1,9 @@
 package com.gyl.awesome_inc.service;
 
-import com.gyl.awesome_inc.domain.dto.AddToCartRequest;
-import com.gyl.awesome_inc.domain.dto.AddToCartResponse;
-import com.gyl.awesome_inc.domain.dto.GetCartResponse;
+import com.gyl.awesome_inc.domain.dto.*;
 import com.gyl.awesome_inc.domain.model.Customer;
 import com.gyl.awesome_inc.domain.model.CustomerProduct;
+import com.gyl.awesome_inc.domain.model.CustomerProductId;
 import com.gyl.awesome_inc.repository.CartRepo;
 import com.gyl.awesome_inc.repository.CustomerRepo;
 import lombok.RequiredArgsConstructor;
@@ -56,5 +55,32 @@ public class CartService {
 
 
         return ResponseEntity.ok().body(getCartResponseList);
+    }
+
+    public ResponseEntity<?> update(String customerId, UpdateCartRequest updateCartRequest) {
+        CustomerProductId customerProductId = new CustomerProductId();
+        customerProductId.setCustomerId(customerId);
+        customerProductId.setProductId(updateCartRequest.getProductId());
+        Optional<CustomerProduct> customerProductOptional = cartRepo.findById(customerProductId);
+        if (customerProductOptional.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        CustomerProduct customerProduct = customerProductOptional.get();
+        customerProduct.setQuantity(Integer.valueOf(updateCartRequest.getQuantity()));
+        CustomerProduct saveCustomerProduct = cartRepo.save(customerProduct);
+        UpdateCartResponse updateCartResponse = new UpdateCartResponse();
+        updateCartResponse.setProductId(saveCustomerProduct.getId().getProductId());
+        updateCartResponse.setQuantity(String.valueOf(saveCustomerProduct.getQuantity()));
+
+        return ResponseEntity.ok().body(updateCartResponse);
+    }
+
+    public ResponseEntity<?> delete(String customerId, DeleteCartRequest deleteCartRequest) {
+        CustomerProductId customerProductId = new CustomerProductId();
+        customerProductId.setCustomerId(customerId);
+        customerProductId.setProductId(deleteCartRequest.getProductId());
+        cartRepo.deleteById(customerProductId);
+        return ResponseEntity.ok().build();
     }
 }
