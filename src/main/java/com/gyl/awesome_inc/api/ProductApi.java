@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.*;
 public class ProductApi {
     private final ProductService productService;
 
+    @GetMapping("{id}")
+    public ResponseEntity<?> get(@PathVariable String id) {
+        return productService.get(id);
+    }
+
     @GetMapping("/keyword")
     public ResponseEntity<?> getKeyword(@RequestParam String q) {
         return productService.getKeyword(q);
