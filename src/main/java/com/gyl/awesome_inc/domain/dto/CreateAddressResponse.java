@@ -1,10 +1,8 @@
 package com.gyl.awesome_inc.domain.dto;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 public class CreateAddressResponse {
     private String shipAddressId;
     private String postalCode;

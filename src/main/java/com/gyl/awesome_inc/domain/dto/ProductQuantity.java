@@ -1,9 +1,11 @@
 package com.gyl.awesome_inc.domain.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class UpdateCartResponse {
+@Getter
+@Setter
+public class ProductQuantity {
     private String productId;
     private String quantity;
 }

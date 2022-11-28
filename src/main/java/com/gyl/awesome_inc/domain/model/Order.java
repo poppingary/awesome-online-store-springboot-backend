@@ -20,9 +20,6 @@ public class Order {
     @Column(name = "order_id", nullable = false, length = 50)
     private String id;
 
-    @Column(name = "order_date", nullable = false)
-    private Instant orderDate;
-
     @Column(name = "ship_mode", nullable = false, length = 30)
     private String shipMode;
 
@@ -56,4 +53,19 @@ public class Order {
 
     @OneToMany(mappedBy = "order")
     private Set<OrderProduct> OrderProducts = new LinkedHashSet<>();
+
+    @Column(name = "order_date", nullable = false)
+    private Instant orderDate;
+
+    @Column(name = "credit_card_holder", nullable = false, length = 50)
+    private String creditCardHolder;
+
+    @Column(name = "credit_card_number", nullable = false, length = 30)
+    private String creditCardNumber;
+
+    @Column(name = "credit_card_expired_date", nullable = false, length = 10)
+    private String creditCardExpiredDate;
+
+    @Column(name = "credit_card_cvv", nullable = false, length = 100)
+    private String creditCardCvv;
 }
