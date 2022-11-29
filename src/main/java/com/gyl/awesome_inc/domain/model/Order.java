@@ -47,7 +47,7 @@ public class Order {
     @Column(name = "is_returned", nullable = false, length = 1)
     private String isReturned;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 

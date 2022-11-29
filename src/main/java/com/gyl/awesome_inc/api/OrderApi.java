@@ -20,4 +20,9 @@ public class OrderApi {
     public ResponseEntity<?> create(@RequestBody @Valid AddOrderRequest addOrderRequest) {
         return orderService.create(addOrderRequest);
     }
+
+    @GetMapping
+    public ResponseEntity<?> getOrdersByCustomerId(@RequestParam String customerId) {
+        return orderService.getByCustomerId(customerId);
+    }
 }

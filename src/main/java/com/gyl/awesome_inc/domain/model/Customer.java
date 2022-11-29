@@ -51,8 +51,8 @@ public class Customer {
     private Set<Order> orders = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "customer")
-    private Set<PasswordResetToken> fa22SgPasswordResetTokens = new LinkedHashSet<>();
+    private Set<CustomerProduct> CustomerProducts = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "customer")
-    private Set<CustomerProduct> CustomerProducts = new LinkedHashSet<>();
+    private Set<PasswordResetToken> PasswordResetTokens = new LinkedHashSet<>();
 }

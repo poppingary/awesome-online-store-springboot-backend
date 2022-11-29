@@ -38,7 +38,7 @@ public class AddressAdminApi {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAddressByCustomerId(@RequestParam String customerId) {
+    public ResponseEntity<?> getAddressesByCustomerId(@RequestParam String customerId) {
         return addressService.getByCustomerId(customerId);
     }
 }
