@@ -2,7 +2,6 @@ package com.gyl.awesome_inc.service;
 
 import com.gyl.awesome_inc.domain.dto.*;
 import com.gyl.awesome_inc.domain.model.*;
-import com.gyl.awesome_inc.repository.CustomerRepo;
 import com.gyl.awesome_inc.repository.OrderProductRepo;
 import com.gyl.awesome_inc.repository.OrderRepo;
 import com.gyl.awesome_inc.repository.ProductRepo;
@@ -26,7 +25,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class OrderService {
     private static final String PATTERN_FORMAT = "MM/dd/yyyy";
-    private final CustomerRepo customerRepo;
+    private final CustomerService customerService;
     private final ModelMapper modelMapper;
     private final ProductRepo productRepo;
     private final PasswordEncoder bcryptEncoder;
@@ -35,12 +34,7 @@ public class OrderService {
 
     @Transactional
     public ResponseEntity<?> create(AddOrderRequest addOrderRequest) {
-        String customerId = addOrderRequest.getCustomerId();
-        Optional<Customer> customerOptional = customerRepo.findById(customerId);
-        if (customerOptional.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        Customer customer = customerOptional.get();
+        Customer customer = customerService.getCustomerById(addOrderRequest.getCustomerId());
 
         List<ProductQuantity> orderProductList = addOrderRequest.getProductQuantityList();
         for (ProductQuantity productQuantity : orderProductList) {
@@ -133,41 +127,50 @@ public class OrderService {
     }
 
     public ResponseEntity<?> getByCustomerId(String customerId) {
-        Optional<Customer> customerOptional = customerRepo.findById(customerId);
-        if (customerOptional.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        Customer customer = customerOptional.get();
-        Set<OrderResponse> orderResponseSet = new HashSet<>();
-        Set<Order> orderSet = customer.getOrders();
-        for (Order order : orderSet) {
-            OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
-            Set<OrderProduct> orderProductSet = order.getOrderProducts();
-            Set<ProductResponse> productResponseSet = new HashSet<>();
-            for (OrderProduct orderProduct : orderProductSet) {
-                ProductResponse productResponse = new ProductResponse();
-                productResponse.setProductName(orderProduct.getProduct().getProductName());
-                productResponse.setQuantity(orderProduct.getQuantity());
-                productResponse.setActualPrice(orderProduct.getActualPrice());
-                productResponseSet.add(productResponse);
-            }
-            orderResponse.setProductResponseSet(productResponseSet);
-            String arrivingDate = getArrivingDate(order);
-            orderResponse.setArrivingDate(arrivingDate);
-            BigDecimal totalPrice = getTotalPrice(orderProductSet);
-            orderResponse.setTotalPrice(totalPrice);
-            orderResponseSet.add(orderResponse);
+        Customer customer = customerService.getCustomerById(customerId);
 
-        }
         GetOrderResponse getOrderResponse = new GetOrderResponse();
-        getOrderResponse.setOrderSet(orderResponseSet);
+        Set<OrderResponse> orderResponseSet = getOrderResponseSet(customer);
+        getOrderResponse.setOrderResponseSet(orderResponseSet);
 
         return ResponseEntity.ok().body(getOrderResponse);
     }
 
-    private BigDecimal getTotalPrice(Set<OrderProduct> orderProductSet) {
+    private Set<OrderResponse> getOrderResponseSet(Customer customer) {
+        Set<OrderResponse> orderResponseSet = new HashSet<>();
+
+        Set<Order> orderSet = customer.getOrders();
+        for (Order order : orderSet) {
+            OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
+            Set<ProductInOrderResponse> productInOrderResponseSet = getProductInOrderResponsesSet(order);
+            orderResponse.setProductInOrderResponseSet(productInOrderResponseSet);
+            String arrivingDate = getArrivingDate(order);
+            orderResponse.setArrivingDate(arrivingDate);
+            BigDecimal totalPrice = getTotalPrice(order);
+            orderResponse.setTotalPrice(totalPrice);
+            orderResponseSet.add(orderResponse);
+        }
+
+        return orderResponseSet;
+    }
+
+    private Set<ProductInOrderResponse> getProductInOrderResponsesSet(Order order) {
+        Set<ProductInOrderResponse> productInOrderResponseSet = new HashSet<>();
+
+        Set<OrderProduct> orderProductSet = order.getOrderProducts();
+        for (OrderProduct orderProduct : orderProductSet) {
+            ProductInOrderResponse productInOrderResponse = modelMapper.map(orderProduct, ProductInOrderResponse.class);
+            productInOrderResponse.setProductName(orderProduct.getProduct().getProductName());
+            productInOrderResponseSet.add(productInOrderResponse);
+        }
+
+        return productInOrderResponseSet;
+    }
+
+    private BigDecimal getTotalPrice(Order order) {
         BigDecimal sum = BigDecimal.ZERO;
 
+        Set<OrderProduct> orderProductSet = order.getOrderProducts();
         for (OrderProduct orderProduct : orderProductSet) {
             BigDecimal temp = orderProduct.getActualPrice().multiply(BigDecimal.valueOf(orderProduct.getQuantity()));
             sum = sum.add(temp);

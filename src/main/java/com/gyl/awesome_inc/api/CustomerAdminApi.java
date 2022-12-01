@@ -1,13 +1,10 @@
 package com.gyl.awesome_inc.api;
 
 import com.gyl.awesome_inc.domain.dto.*;
-import com.gyl.awesome_inc.domain.model.Customer;
 import com.gyl.awesome_inc.service.CustomerService;
-import com.gyl.awesome_inc.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;

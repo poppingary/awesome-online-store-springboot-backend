@@ -3,7 +3,6 @@ package com.gyl.awesome_inc.service;
 import com.gyl.awesome_inc.domain.dto.*;
 import com.gyl.awesome_inc.domain.model.Customer;
 import com.gyl.awesome_inc.domain.model.ShipAddress;
-import com.gyl.awesome_inc.repository.CustomerRepo;
 import com.gyl.awesome_inc.repository.ShipAddressRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -19,17 +18,14 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AddressService {
-    private final CustomerRepo customerRepo;
+    private final CustomerService customerService;
     private final ModelMapper modelMapper;
     private final ShipAddressRepo shipAddressRepo;
 
     @Transactional
     public ResponseEntity<?> create(CreateAddressRequest createAddressRequest) {
-        Optional<Customer> customerOptional = customerRepo.findById(createAddressRequest.getCustomerId());
-        if (customerOptional.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        Customer customer = customerOptional.get();
+        Customer customer = customerService.getCustomerById(createAddressRequest.getCustomerId());
+
         Set<ShipAddress> shipAddressSet = customer.getShipAddresses();
         ShipAddress saveShipAddress = saveNewShipAddress(createAddressRequest, shipAddressSet, customer);
         shipAddressSet.add(saveShipAddress);
@@ -102,11 +98,9 @@ public class AddressService {
     }
 
     public ResponseEntity<?> getByCustomerId(String id) {
-        Optional<Customer> customerOptional = customerRepo.findById(id);
-        if (customerOptional.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        Set<ShipAddress> shipAddressSet = customerOptional.get().getShipAddresses();
+        Customer customer = customerService.getCustomerById(id);
+
+        Set<ShipAddress> shipAddressSet = customer.getShipAddresses();
 
         Set<GetAddressByCustomerIdResponse> getAddressByCustomerIdResponseSet = new HashSet<>();
         for (ShipAddress address : shipAddressSet) {

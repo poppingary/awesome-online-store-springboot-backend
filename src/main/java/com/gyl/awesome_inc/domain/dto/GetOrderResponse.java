@@ -6,5 +6,5 @@ import java.util.Set;
 
 @Data
 public class GetOrderResponse {
-    private Set<OrderResponse> orderSet;
+    private Set<OrderResponse> orderResponseSet;
 }

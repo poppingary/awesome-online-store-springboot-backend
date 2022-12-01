@@ -1,12 +1,17 @@
 package com.gyl.awesome_inc.service;
 
 import com.gyl.awesome_inc.domain.dto.*;
-import com.gyl.awesome_inc.domain.model.*;
+import com.gyl.awesome_inc.domain.exception.CustomerIdFoundException;
+import com.gyl.awesome_inc.domain.model.Customer;
+import com.gyl.awesome_inc.domain.model.PasswordResetToken;
+import com.gyl.awesome_inc.domain.model.SecurityQuestion;
+import com.gyl.awesome_inc.domain.model.ShipAddress;
 import com.gyl.awesome_inc.repository.CustomerRepo;
 import com.gyl.awesome_inc.repository.PasswordResetTokenRepo;
 import com.gyl.awesome_inc.repository.SecurityQuestionRepo;
 import com.gyl.awesome_inc.repository.ShipAddressRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,6 +33,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerService implements UserDetailsService {
     private final EmailService emailService;
     private final CustomerRepo customerRepo;
@@ -39,23 +45,23 @@ public class CustomerService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<Customer> customer = customerRepo.findByEmail(email);
+        Customer customer = customerRepo
+                .findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User's email not found: " + email));
 
-        if (customer.isEmpty()) {
-            throw new UsernameNotFoundException("User not found with email: " + email);
-        }
-
-        return new User(customer.get().getEmail(), customer.get().getPassword(), new ArrayList<>());
+        return User.withUsername(customer.getEmail()).password(customer.getPassword()).authorities(new ArrayList<>()).build();
     }
 
     public Customer getCustomerByEmail(String email) throws UsernameNotFoundException {
-        Optional<Customer> customer = customerRepo.findByEmail(email);
+        return customerRepo
+                .findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User's email not found: " + email));
+    }
 
-        if (customer.isEmpty()) {
-            throw new UsernameNotFoundException("User not found with email: " + email);
-        }
-
-        return customer.get();
+    public Customer getCustomerById(String id) {
+        return customerRepo
+                .findById(id)
+                .orElseThrow(() -> new CustomerIdFoundException("Customer id not found: " + id));
     }
 
     @Transactional

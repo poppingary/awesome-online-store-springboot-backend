@@ -15,8 +15,10 @@ public class OrderResponse {
     private String country;
     private String region;
     private String market;
+    private String shipMode;
+    private String orderPriority;
     private Instant orderDate;
     private BigDecimal totalPrice;
     private String arrivingDate;
-    private Set<ProductResponse> productResponseSet;
+    private Set<ProductInOrderResponse> productInOrderResponseSet;
 }
