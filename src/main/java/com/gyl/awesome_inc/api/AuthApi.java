@@ -45,9 +45,11 @@ public class AuthApi {
     }
 
     private String authenticateUserAndGetEmail(AuthRequest authRequest) {
-        return authenticationManager.authenticate(
+        String email = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
-        ).getPrincipal().toString();
+        ).getName();
+
+        return email;
     }
 
     private boolean isSecurityQuestionAndAnswerCorrect(AuthRequest authRequest, Customer customer) {
