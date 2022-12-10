@@ -23,7 +23,7 @@ public class CartService {
     private final CartRepo cartRepo;
     private final CustomerRepo customerRepo;
 
-    public ResponseEntity<?> create(AddToCartRequest addToCartRequest) {
+    public ResponseEntity<AddToCartResponse> create(AddToCartRequest addToCartRequest) {
         CustomerProduct customerProduct = modelMapper.map(addToCartRequest, CustomerProduct.class);
         customerProduct.getId().setCustomerId(addToCartRequest.getCustomerId());
         customerProduct.getId().setProductId(addToCartRequest.getProductId());
@@ -34,7 +34,7 @@ public class CartService {
         return ResponseEntity.ok().body(addToCartResponse);
     }
 
-    public ResponseEntity<?> get(String customerId) {
+    public ResponseEntity<List<GetCartResponse>> get(String customerId) {
         Optional<Customer> customerOptional = customerRepo.findById(customerId);
         if (customerOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -57,7 +57,7 @@ public class CartService {
         return ResponseEntity.ok().body(getCartResponseList);
     }
 
-    public ResponseEntity<?> update(String customerId, UpdateCartRequest updateCartRequest) {
+    public ResponseEntity<UpdateCartResponse> update(String customerId, UpdateCartRequest updateCartRequest) {
         CustomerProductId customerProductId = new CustomerProductId();
         customerProductId.setCustomerId(customerId);
         customerProductId.setProductId(updateCartRequest.getProductId());

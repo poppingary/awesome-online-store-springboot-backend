@@ -33,7 +33,7 @@ public class OrderService {
     private final OrderProductRepo orderProductRepo;
 
     @Transactional
-    public ResponseEntity<?> create(AddOrderRequest addOrderRequest) {
+    public ResponseEntity<AddOrderResponse> create(AddOrderRequest addOrderRequest) {
         Customer customer = customerService.getCustomerById(addOrderRequest.getCustomerId());
 
         List<ProductQuantity> orderProductList = addOrderRequest.getProductQuantityList();
@@ -126,7 +126,7 @@ public class OrderService {
         return formatter.format(orderDate);
     }
 
-    public ResponseEntity<?> getByCustomerId(String customerId) {
+    public ResponseEntity<GetOrderResponse> getByCustomerId(String customerId) {
         Customer customer = customerService.getCustomerById(customerId);
 
         GetOrderResponse getOrderResponse = new GetOrderResponse();

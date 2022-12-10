@@ -27,7 +27,7 @@ public class AuthApi {
     private final JwtTokenUtil jwtTokenUtil;
 
     @PostMapping(value = "login")
-    public ResponseEntity<?> login(@RequestBody @Valid AuthRequest authRequest) {
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequest authRequest) {
         String email = authenticateUserAndGetEmail(authRequest);
 
         Customer customer = customerService.getCustomerByEmail(email);
@@ -45,11 +45,9 @@ public class AuthApi {
     }
 
     private String authenticateUserAndGetEmail(AuthRequest authRequest) {
-        String email = authenticationManager.authenticate(
+        return authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
         ).getName();
-
-        return email;
     }
 
     private boolean isSecurityQuestionAndAnswerCorrect(AuthRequest authRequest, Customer customer) {

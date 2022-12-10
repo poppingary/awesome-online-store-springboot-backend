@@ -1,7 +1,6 @@
 package com.gyl.awesome_inc.api;
 
-import com.gyl.awesome_inc.domain.dto.CreateAddressRequest;
-import com.gyl.awesome_inc.domain.dto.UpdateAddressRequest;
+import com.gyl.awesome_inc.domain.dto.*;
 import com.gyl.awesome_inc.service.AddressService;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
@@ -9,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Set;
 
 @RestController
 @RequestMapping(path = "api/admin/customer/address")
@@ -18,17 +18,17 @@ public class AddressAdminApi {
     private final AddressService addressService;
 
     @PostMapping
-    public ResponseEntity<?> createAddress(@RequestBody @Valid CreateAddressRequest createAddressRequest) {
+    public ResponseEntity<Set<CreateAddressResponse>> createAddress(@RequestBody @Valid CreateAddressRequest createAddressRequest) {
         return addressService.create(createAddressRequest);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> get(@PathVariable String id) {
+    public ResponseEntity<GetAddressResponse> get(@PathVariable String id) {
         return addressService.get(id);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> update(@PathVariable String id, @RequestBody @Valid UpdateAddressRequest updateShipAddressRequest) {
+    public ResponseEntity<UpdateAddressResponse> update(@PathVariable String id, @RequestBody @Valid UpdateAddressRequest updateShipAddressRequest) {
         return addressService.update(id, updateShipAddressRequest);
     }
 
@@ -38,7 +38,7 @@ public class AddressAdminApi {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAddressesByCustomerId(@RequestParam String customerId) {
+    public ResponseEntity<Set<GetAddressByCustomerIdResponse>> getAddressesByCustomerId(@RequestParam String customerId) {
         return addressService.getByCustomerId(customerId);
     }
 }

@@ -65,7 +65,7 @@ public class CustomerService implements UserDetailsService {
     }
 
     @Transactional
-    public ResponseEntity<?> create(RegisterRequest registerRequest) {
+    public ResponseEntity<RegisterResponse> create(RegisterRequest registerRequest) {
         Customer customer = createNewCustomer(registerRequest);
         Customer saveCustomer = customerRepo.save(customer);
 
@@ -112,7 +112,7 @@ public class CustomerService implements UserDetailsService {
         return registerResponse;
     }
 
-    public ResponseEntity<?> get(String customerId) {
+    public ResponseEntity<GetCustomerInfoResponse> get(String customerId) {
         Optional<Customer> customerOptional = customerRepo.findById(customerId);
         if (customerOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -124,7 +124,7 @@ public class CustomerService implements UserDetailsService {
     }
 
     @Transactional
-    public ResponseEntity<?> update(String customerId, UpdateCustomerInfoRequest updateCustomerInfoRequest) {
+    public ResponseEntity<UpdateCustomerInfoResponse> update(String customerId, UpdateCustomerInfoRequest updateCustomerInfoRequest) {
         Optional<Customer> customerOptional = customerRepo.findById(customerId);
         if (customerOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();

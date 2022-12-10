@@ -23,7 +23,7 @@ public class AddressService {
     private final ShipAddressRepo shipAddressRepo;
 
     @Transactional
-    public ResponseEntity<?> create(CreateAddressRequest createAddressRequest) {
+    public ResponseEntity<Set<CreateAddressResponse>> create(CreateAddressRequest createAddressRequest) {
         Customer customer = customerService.getCustomerById(createAddressRequest.getCustomerId());
 
         Set<ShipAddress> shipAddressSet = customer.getShipAddresses();
@@ -62,7 +62,7 @@ public class AddressService {
         return shipAddress;
     }
 
-    public ResponseEntity<?> get(String id) {
+    public ResponseEntity<GetAddressResponse> get(String id) {
         Optional<ShipAddress> shipAddressOptional = shipAddressRepo.findById(id);
         if (shipAddressOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -73,7 +73,7 @@ public class AddressService {
         return ResponseEntity.ok().body(getAddressResponse);
     }
 
-    public ResponseEntity<?> update(String id, UpdateAddressRequest updateShipAddressRequest) {
+    public ResponseEntity<UpdateAddressResponse> update(String id, UpdateAddressRequest updateShipAddressRequest) {
         Optional<ShipAddress> shipAddressOptional = shipAddressRepo.findById(id);
         if (shipAddressOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -97,7 +97,7 @@ public class AddressService {
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<?> getByCustomerId(String id) {
+    public ResponseEntity<Set<GetAddressByCustomerIdResponse>> getByCustomerId(String id) {
         Customer customer = customerService.getCustomerById(id);
 
         Set<ShipAddress> shipAddressSet = customer.getShipAddresses();

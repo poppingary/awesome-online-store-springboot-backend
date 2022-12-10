@@ -18,17 +18,17 @@ public class CustomerAdminApi {
     private final CustomerService customerService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody @Valid RegisterRequest registerRequest) {
+    public ResponseEntity<RegisterResponse> create(@RequestBody @Valid RegisterRequest registerRequest) {
         return customerService.create(registerRequest);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> get(@PathVariable String id) {
+    public ResponseEntity<GetCustomerInfoResponse> get(@PathVariable String id) {
         return customerService.get(id);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> update(@PathVariable String id, @RequestBody @Valid UpdateCustomerInfoRequest updateCustomerInfoRequest) {
+    public ResponseEntity<UpdateCustomerInfoResponse> update(@PathVariable String id, @RequestBody @Valid UpdateCustomerInfoRequest updateCustomerInfoRequest) {
         return customerService.update(id, updateCustomerInfoRequest);
     }
 

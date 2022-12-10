@@ -1,8 +1,6 @@
 package com.gyl.awesome_inc.api;
 
-import com.gyl.awesome_inc.domain.dto.AddToCartRequest;
-import com.gyl.awesome_inc.domain.dto.DeleteCartRequest;
-import com.gyl.awesome_inc.domain.dto.UpdateCartRequest;
+import com.gyl.awesome_inc.domain.dto.*;
 import com.gyl.awesome_inc.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
@@ -10,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "api/cart")
@@ -19,17 +18,17 @@ public class CartApi {
     private final CartService cartService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody @Valid AddToCartRequest addToCartRequest) {
+    public ResponseEntity<AddToCartResponse> create(@RequestBody @Valid AddToCartRequest addToCartRequest) {
         return cartService.create(addToCartRequest);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> get(@PathVariable String id) {
+    public ResponseEntity<List<GetCartResponse>> get(@PathVariable String id) {
         return cartService.get(id);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> update(@PathVariable String id, @RequestBody @Valid UpdateCartRequest updateCartRequest) {
+    public ResponseEntity<UpdateCartResponse> update(@PathVariable String id, @RequestBody @Valid UpdateCartRequest updateCartRequest) {
         return cartService.update(id, updateCartRequest);
     }
     

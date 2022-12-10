@@ -17,7 +17,7 @@ public class ProductService {
     private final ProductRepo productRepo;
     private final ModelMapper modelMapper;
 
-    public ResponseEntity<?> get(String id) {
+    public ResponseEntity<Product> get(String id) {
         Optional<Product> productOptional = productRepo.findById(id);
         if (productOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -26,7 +26,7 @@ public class ProductService {
         return ResponseEntity.ok().body(productOptional.get());
     }
 
-    public ResponseEntity<?> getKeyword(String keyword) {
+    public ResponseEntity<Set<String>> getKeyword(String keyword) {
         List<Product> productList = productRepo.findByProductNameLike("%" + keyword.strip() + "%");
         Set<String> results = new TreeSet<>();
         for (Product product : productList) {
@@ -36,7 +36,7 @@ public class ProductService {
         return ResponseEntity.ok().body(results);
     }
 
-    public ResponseEntity<?> search(String productName) {
+    public ResponseEntity<List<SearchResponse>> search(String productName) {
         List<Product> productList = productRepo.findByProductNameLike("%" + productName.strip() + "%");
 
         List<SearchResponse> searchResponseList = new ArrayList<>();
