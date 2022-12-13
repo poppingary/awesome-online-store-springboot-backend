@@ -21,7 +21,7 @@ public class OrderApi {
         return orderService.create(addOrderRequest);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("return/{id}")
     public ResponseEntity<ReturnOrderResponse> update(@PathVariable String id, @RequestBody @Valid ReturnOrderRequest returnOrderRequest) {
         return orderService.update(id, returnOrderRequest);
     }
