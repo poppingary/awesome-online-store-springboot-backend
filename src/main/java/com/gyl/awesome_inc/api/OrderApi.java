@@ -1,8 +1,6 @@
 package com.gyl.awesome_inc.api;
 
-import com.gyl.awesome_inc.domain.dto.AddOrderRequest;
-import com.gyl.awesome_inc.domain.dto.AddOrderResponse;
-import com.gyl.awesome_inc.domain.dto.GetOrderResponse;
+import com.gyl.awesome_inc.domain.dto.*;
 import com.gyl.awesome_inc.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
@@ -21,6 +19,11 @@ public class OrderApi {
     @PostMapping
     public ResponseEntity<AddOrderResponse> create(@RequestBody @Valid AddOrderRequest addOrderRequest) {
         return orderService.create(addOrderRequest);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<ReturnOrderResponse> update(@PathVariable String id, @RequestBody @Valid ReturnOrderRequest returnOrderRequest) {
+        return orderService.update(id, returnOrderRequest);
     }
 
     @GetMapping

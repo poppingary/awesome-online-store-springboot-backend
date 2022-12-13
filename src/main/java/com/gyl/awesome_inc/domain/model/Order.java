@@ -1,5 +1,6 @@
 package com.gyl.awesome_inc.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -49,23 +50,29 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnore
     private Customer customer;
 
     @OneToMany(mappedBy = "order")
+    @JsonIgnore
     private Set<OrderProduct> OrderProducts = new LinkedHashSet<>();
 
     @Column(name = "order_date", nullable = false)
     private Instant orderDate;
 
     @Column(name = "credit_card_holder", nullable = false, length = 50)
+    @JsonIgnore
     private String creditCardHolder;
 
     @Column(name = "credit_card_number", nullable = false, length = 30)
+    @JsonIgnore
     private String creditCardNumber;
 
     @Column(name = "credit_card_expired_date", nullable = false, length = 10)
+    @JsonIgnore
     private String creditCardExpiredDate;
 
     @Column(name = "credit_card_cvv", nullable = false, length = 100)
+    @JsonIgnore
     private String creditCardCvv;
 }

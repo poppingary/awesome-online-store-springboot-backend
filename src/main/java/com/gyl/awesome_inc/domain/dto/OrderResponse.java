@@ -17,6 +17,7 @@ public class OrderResponse {
     private String market;
     private String shipMode;
     private String orderPriority;
+    private String isReturned;
     private Instant orderDate;
     private BigDecimal totalPrice;
     private String arrivingDate;

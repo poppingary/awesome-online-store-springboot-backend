@@ -1,6 +1,5 @@
 package com.gyl.awesome_inc.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 

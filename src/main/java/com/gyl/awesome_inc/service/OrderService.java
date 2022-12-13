@@ -178,4 +178,17 @@ public class OrderService {
 
         return sum.setScale(2, RoundingMode.UP);
     }
+
+    public ResponseEntity<ReturnOrderResponse> update(String orderId, ReturnOrderRequest returnOrderRequest) {
+        Optional<Order> orderOptional = orderRepo.findById(orderId);
+        if (orderOptional.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Order order = orderOptional.get();
+        order.setIsReturned(returnOrderRequest.getIsReturned());
+        Order saveOrder = orderRepo.save(order);
+
+        return ResponseEntity.ok().body(new ReturnOrderResponse(saveOrder));
+    }
 }
