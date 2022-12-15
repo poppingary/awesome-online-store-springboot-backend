@@ -26,10 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.mail.MessagingException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -157,10 +154,25 @@ public class CustomerService implements UserDetailsService {
             return ResponseEntity.badRequest().build();
         }
 
+        if (isRequestOverThreeTimesADay(customer)) {
+            return ResponseEntity.badRequest().build();
+        }
         ForgotPasswordResponse forgotPasswordResponse = constructEmailAndCreateResetToken(customer, forgotPasswordRequest);
         emailService.sendSimpleMessage(forgotPasswordResponse.getEmail(), forgotPasswordResponse.getSubject(), forgotPasswordResponse.getText());
 
         return ResponseEntity.ok().build();
+    }
+
+    private boolean isRequestOverThreeTimesADay(Customer customer) {
+        return passwordResetTokenRepo.countByCustomerAndExpiryDateIsAfter(customer, getNowDate()) >= 3;
+    }
+
+    private Date getNowDate() {
+        return Date.from(
+                LocalDateTime
+                        .now()
+                        .atZone(ZoneOffset.of("+00:00"))
+                        .toInstant());
     }
 
     private ForgotPasswordResponse constructEmailAndCreateResetToken(Customer customer, ForgotPasswordRequest forgotPasswordRequest) {
@@ -185,8 +197,7 @@ public class CustomerService implements UserDetailsService {
     }
 
     private void createResetToken(Customer customer, String token) {
-        Optional<PasswordResetToken> passwordResetTokenOptional = passwordResetTokenRepo.findByCustomer(customer);
-        PasswordResetToken passwordResetToken = passwordResetTokenOptional.orElseGet(PasswordResetToken::new);
+        PasswordResetToken passwordResetToken = new PasswordResetToken();
         passwordResetToken.setToken(token);
         passwordResetToken.setCustomer(customer);
         passwordResetToken.setExpiryDate(Date.from(
@@ -202,8 +213,12 @@ public class CustomerService implements UserDetailsService {
     @Transactional
     public ResponseEntity<?> changePassword(ChangePasswordRequest changePasswordRequest) {
         String token = changePasswordRequest.getResetToken();
-        Optional<PasswordResetToken> passwordResetTokenOptional = passwordResetTokenRepo.findByToken(token);
-        if (passwordResetTokenOptional.isEmpty() || !isResetTokenValid(passwordResetTokenOptional.get())) {
+        if (!isResetTokenValid(token)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Optional<PasswordResetToken> passwordResetTokenOptional = passwordResetTokenRepo.findById(token);
+        if (passwordResetTokenOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
         Optional<Customer> customerOptional = customerRepo.findById(passwordResetTokenOptional.get().getCustomer().getId());
@@ -216,12 +231,8 @@ public class CustomerService implements UserDetailsService {
         return ResponseEntity.ok().build();
     }
 
-    private boolean isResetTokenValid(PasswordResetToken passwordResetToken) {
-        LocalDateTime expiryDateLocal = passwordResetToken.getExpiryDate().toInstant()
-                .atZone(ZoneOffset.of("+00:00"))
-                .toLocalDateTime();
-
-        return LocalDateTime.now().isBefore(expiryDateLocal);
+    private boolean isResetTokenValid(String token) {
+        return passwordResetTokenRepo.countPasswordResetTokenAndExpiryDateIsAfter(token, getNowDate()) > 0;
     }
 
     public ResponseEntity<?> updatePassword(UpdatePasswordRequest updatePasswordRequest) {
