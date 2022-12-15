@@ -232,7 +232,7 @@ public class CustomerService implements UserDetailsService {
     }
 
     private boolean isResetTokenValid(String token) {
-        return passwordResetTokenRepo.countPasswordResetTokenAndExpiryDateIsAfter(token, getNowDate()) > 0;
+        return passwordResetTokenRepo.countByTokenAndExpiryDateIsAfter(token, getNowDate()) > 0;
     }
 
     public ResponseEntity<?> updatePassword(UpdatePasswordRequest updatePasswordRequest) {
