@@ -40,8 +40,7 @@ public class CartService {
             return ResponseEntity.badRequest().build();
         }
 
-        Customer customer = customerOptional.get();
-        Set<CustomerProduct> customerProductSet = customer.getCustomerProducts();
+        Set<CustomerProduct> customerProductSet = customerOptional.get().getCustomerProducts();
         List<GetCartResponse> getCartResponseList = new ArrayList<>();
         for (CustomerProduct customerProduct : customerProductSet) {
             GetCartResponse getCartResponse = new GetCartResponse();
@@ -52,7 +51,6 @@ public class CartService {
             getCartResponse.setDiscount(String.valueOf(customerProduct.getProduct().getDiscount()));
             getCartResponseList.add(getCartResponse);
         }
-
 
         return ResponseEntity.ok().body(getCartResponseList);
     }
