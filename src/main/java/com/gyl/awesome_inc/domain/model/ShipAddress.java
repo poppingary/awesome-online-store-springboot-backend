@@ -32,7 +32,7 @@ public class ShipAddress {
     @Column(name = "market", nullable = false, length = 20)
     private String market;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 

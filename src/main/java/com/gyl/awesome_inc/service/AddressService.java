@@ -40,14 +40,14 @@ public class AddressService {
     }
 
     private ShipAddress saveNewShipAddress(CreateAddressRequest createAddressRequest, Set<ShipAddress> shipAddressSet, Customer customer) {
-        setPrimaryAddress(createAddressRequest, shipAddressSet);
+        setPrimaryAddress(createAddressRequest.getIsPrimary(), shipAddressSet);
         ShipAddress shipAddress = createNewShipAddress(createAddressRequest, customer);
 
         return shipAddressRepo.save(shipAddress);
     }
 
-    private void setPrimaryAddress(CreateAddressRequest createAddressRequest, Set<ShipAddress> shipAddressSet) {
-        if (createAddressRequest.getIsPrimary().equals("Y") && !shipAddressSet.isEmpty()) {
+    private void setPrimaryAddress(String isPrimary, Set<ShipAddress> shipAddressSet) {
+        if (isPrimary.equals("Y") && !shipAddressSet.isEmpty()) {
             for (ShipAddress address : shipAddressSet) {
                 address.setIsPrimary("N");
             }
@@ -79,6 +79,9 @@ public class AddressService {
             return ResponseEntity.badRequest().build();
         }
         ShipAddress shipAddress = shipAddressOptional.get();
+        Customer customer = shipAddress.getCustomer();
+        Set<ShipAddress> shipAddressSet = customer.getShipAddresses();
+        setPrimaryAddress(updateShipAddressRequest.getIsPrimary(), shipAddressSet);
         shipAddress.setPostalCode(updateShipAddressRequest.getPostalCode());
         shipAddress.setCity(updateShipAddressRequest.getCity());
         shipAddress.setState(updateShipAddressRequest.getState());
@@ -86,6 +89,7 @@ public class AddressService {
         shipAddress.setRegion(updateShipAddressRequest.getRegion());
         shipAddress.setMarket(updateShipAddressRequest.getMarket());
         shipAddress.setIsPrimary(updateShipAddressRequest.getIsPrimary());
+        shipAddress.setCustomer(customer);
         ShipAddress saveShipAddress = shipAddressRepo.save(shipAddress);
         UpdateAddressResponse updateAddressResponse = modelMapper.map(saveShipAddress, UpdateAddressResponse.class);
 

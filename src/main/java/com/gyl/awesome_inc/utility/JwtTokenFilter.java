@@ -3,6 +3,7 @@ package com.gyl.awesome_inc.utility;
 import com.gyl.awesome_inc.domain.model.Customer;
 import com.gyl.awesome_inc.repository.CustomerRepo;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.annotation.Nonnull;
@@ -47,9 +49,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     private boolean hasAuthorizationBearer(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        return !ObjectUtils.isEmpty(header) && header.startsWith("Bearer");
+        return StringUtils.hasText(header) && header.startsWith("Bearer");
     }
 
     private String getAccessToken(HttpServletRequest request) {
