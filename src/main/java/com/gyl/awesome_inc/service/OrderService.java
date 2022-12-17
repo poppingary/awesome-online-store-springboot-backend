@@ -2,6 +2,7 @@ package com.gyl.awesome_inc.service;
 
 import com.gyl.awesome_inc.domain.dto.*;
 import com.gyl.awesome_inc.domain.model.*;
+import com.gyl.awesome_inc.repository.CartRepo;
 import com.gyl.awesome_inc.repository.OrderProductRepo;
 import com.gyl.awesome_inc.repository.OrderRepo;
 import com.gyl.awesome_inc.repository.ProductRepo;
@@ -31,6 +32,7 @@ public class OrderService {
     private final PasswordEncoder bcryptEncoder;
     private final OrderRepo orderRepo;
     private final OrderProductRepo orderProductRepo;
+    private final CartRepo cartRepo;
 
     @Transactional
     public ResponseEntity<AddOrderResponse> create(AddOrderRequest addOrderRequest) {
@@ -50,13 +52,14 @@ public class OrderService {
         }
 
         Order saveOrder = saveOrder(addOrderRequest, customer);
+        cartRepo.deleteByCustomer(customer);
         for (ProductQuantity productQuantity : orderProductList) {
             String productId = productQuantity.getProductId();
             Optional<Product> productOptional = productRepo.findById(productId);
             if (productOptional.isEmpty()) {
                 return ResponseEntity.badRequest().build();
             }
-            Product saveProduct = saveProduct(productOptional.get(), productQuantity);
+            Product saveProduct = saveProductQuantity(productOptional.get(), productQuantity);
             saveOrderProduct(saveOrder, saveProduct, productQuantity);
         }
 
@@ -78,7 +81,7 @@ public class OrderService {
         return orderRepo.save(order);
     }
 
-    private Product saveProduct(Product product, ProductQuantity productQuantity) {
+    private Product saveProductQuantity(Product product, ProductQuantity productQuantity) {
         int requestQuantity = Integer.parseInt(productQuantity.getQuantity());
         int quantityInStock = product.getQuantity();
         product.setQuantity(quantityInStock - requestQuantity);
