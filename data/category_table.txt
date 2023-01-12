@@ -1,0 +1,18 @@
+INSERT INTO fa22_sg_category (category_id, category, subcategory) VALUES 
+('b4badc54-93bc-4929-9aff-0a006a444877', 'Technology', 'Phones'), 
+('152aaea0-8fca-48ef-b3b8-e67b1441f119', 'Furniture', 'Chairs'), 
+('e22da06c-ef59-497d-9ed4-9f9f85c9c4e4', 'Technology', 'Copiers'), 
+('155c4eb6-17c7-4bdc-80b1-c769593fc2cf', 'Furniture', 'Tables'), 
+('1ae3878b-7119-4eed-99cf-1c79515c5823', 'Furniture', 'Bookcases'), 
+('41016e56-494d-43f7-bc03-5f2a1774e769', 'Office Supplies', 'Art'), 
+('c2f862f4-c4fb-442c-a5bf-125bd398176e', 'Office Supplies', 'Appliances'), 
+('e62a392e-0f5b-4b57-869b-46eecd35d631', 'Office Supplies', 'Storage'), 
+('7a0fd927-86bd-48bd-94aa-10d4bbf1b12a', 'Office Supplies', 'Fasteners'), 
+('6e2ccc52-7c62-475c-889b-2571b1f9ada9', 'Technology', 'Machines'), 
+('122a48fa-f9cd-4024-ae32-ef388cfed58b', 'Technology', 'Accessories'), 
+('48cd981f-a0cb-4fc3-958f-a833935ba6ce', 'Furniture', 'Furnishings'), 
+('85db31ab-ea08-46ea-a943-83d02196cb7b', 'Office Supplies', 'Binders'), 
+('54eb36a1-4edb-43a8-8d7d-4b58fdba6f73', 'Office Supplies', 'Labels'), 
+('27cc7518-3aec-4d16-898d-f98c71dbd082', 'Office Supplies', 'Paper'), 
+('3862cbc3-6ae1-4356-8326-93abf5f32628', 'Office Supplies', 'Supplies'), 
+('4b9a7fcd-d30a-4bf0-be52-4e96aa5deb05', 'Office Supplies', 'Envelopes')
