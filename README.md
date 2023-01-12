@@ -6,4 +6,4 @@
 - Mysql 8.0.31
 
 ## Project topology
-![This is an image](project_topology.png)
+![Project topology](project_topology.png)
