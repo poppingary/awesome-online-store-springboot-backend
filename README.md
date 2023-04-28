@@ -7,3 +7,4 @@
 
 ## Project topology
 ![Project topology](project_topology.png)
+- One database will be of OLTP database (Online Transaction Processing System) and other database will be DW (Data Warehouse – DSS)
