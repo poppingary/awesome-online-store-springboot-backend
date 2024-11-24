@@ -6,7 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-@AllArgsConstructor()
+@AllArgsConstructor
 public class AuthResponse implements Serializable {
     private String customerId;
     private String firstName;
